@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.expensetracker.utils.formatDollar
 
 
 @Composable
@@ -27,8 +28,7 @@ fun TotalCard(totalAmount: Double) {
     )
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
 
@@ -47,7 +47,7 @@ fun TotalCard(totalAmount: Double) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "$${"%,.2f".format(totalAmount)}",
+                    text = formatDollar(totalAmount),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimary
