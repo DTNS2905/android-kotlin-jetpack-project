@@ -11,26 +11,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
 
 data class MenuItem(
-    val title: String,
+    val route: String,
+    val label: String,
     val icon: ImageVector
 )
 
+object Routes {
+    const val HOME = "home"
+    const val PROFILE = "profile"
+}
 @Composable
-fun MenuBar() {
+fun MenuBar(
+    navController: NavHostController,
+    currentRoute: String
+) {
+
     val items = listOf(
-        MenuItem("Home", Icons.Filled.Home),
-        MenuItem("Profile", Icons.Filled.Person),
+        MenuItem(Routes.HOME, "home", Icons.Filled.Home),
+        MenuItem(Routes.PROFILE, "profile",Icons.Filled.Person),
     )
     val (indexedItem, setIndexedItem) = remember { mutableIntStateOf(0) }
     NavigationBar() {
-        items.forEachIndexed { index, item ->
+        items.forEach { item ->
             NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.title) },
-                label = { Text(item.title) },
-                selected = indexedItem == index,
-                onClick = {setIndexedItem(index)},
+                icon = { Icon(item.icon, contentDescription = item.label) },
+                label = { Text(item.label) },
+                selected = currentRoute == item.route,
+                onClick = {
+                    navController.navigate(item.route) {
+                        popUpTo(Routes.HOME)
+                        launchSingleTop = true
+                    }
+                },
             )
         }
 

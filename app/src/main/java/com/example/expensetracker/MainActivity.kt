@@ -4,15 +4,29 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.expensetracker.room.database.DatabaseProvider
 import com.example.expensetracker.room.repository.ExpenseRepository
+import com.example.expensetracker.ui.layouts.GeneralLayout
+import com.example.expensetracker.ui.components.Routes
+import com.example.expensetracker.ui.layouts.ScreenLayout
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.example.expensetracker.ui.screens.HomeScreen
+import com.example.expensetracker.ui.screens.ProfileScreen
 import com.example.expensetracker.ui.viewmodel.ExpenseViewModel
 import com.example.expensetracker.ui.viewmodel.ExpenseViewModelFactory
 
@@ -33,12 +47,35 @@ fun App() {
     val context = LocalContext.current
     val db = remember { DatabaseProvider.getDatabase(context) }
     val repo = remember { ExpenseRepository(db.expenseDao()) }
-
+    val navController = rememberNavController()
+    val currentRoute =
+        navController.currentBackStackEntryAsState().value?.destination?.route
+            ?: Routes.HOME
     val expenseViewModel: ExpenseViewModel = viewModel(
         factory = ExpenseViewModelFactory(repo)
     )
+    GeneralLayout(
+        navController = navController,
+        currentRoute = currentRoute
+    ) { paddingValues ->
+        NavHost(
+            navController = navController,
+            startDestination = Routes.HOME,
 
-    HomeScreen(expenseViewModel)
+            ) {
+            composable(Routes.HOME) {
+                ScreenLayout(paddingValues) {
+                    HomeScreen(expenseViewModel)
+                }
+
+            }
+            composable(Routes.PROFILE) {
+                ScreenLayout(paddingValues) {
+                    ProfileScreen()
+                }
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)

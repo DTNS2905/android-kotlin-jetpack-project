@@ -41,7 +41,7 @@ fun TotalCard(totalAmount: Double) {
         ) {
             Column() {
                 Text(
-                    text = "Total Balance",
+                    text = "Total Expenses",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimary
                 )

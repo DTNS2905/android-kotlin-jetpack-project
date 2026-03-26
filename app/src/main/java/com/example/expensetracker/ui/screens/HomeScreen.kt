@@ -29,7 +29,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.expensetracker.R
 import com.example.expensetracker.room.model.Expense
-import com.example.expensetracker.ui.GeneralLayout
 import com.example.expensetracker.ui.components.AddExpenseButton
 import com.example.expensetracker.ui.components.CustomList
 import com.example.expensetracker.ui.components.ImageProfile
@@ -37,37 +36,36 @@ import com.example.expensetracker.ui.components.TotalCard
 import com.example.expensetracker.ui.viewmodel.ExpenseViewModel
 
 @Composable
-fun HomeScreen(expenseViewModel: ExpenseViewModel) {
-
+fun HomeScreen(
+    expenseViewModel: ExpenseViewModel
+) {
     val expenses by expenseViewModel.allExpenses.collectAsState()
     val total by expenseViewModel.totalAmount.collectAsState()
     val (showDialog, setShowDialog) = remember { mutableStateOf(false) }
 
-    GeneralLayout(fabAction = setShowDialog) {
-        Column {
-            Text(
-                text = "Welcome. Sang",
-                style = MaterialTheme.typography.titleLarge,
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            ImageProfile(imageRes = R.drawable.sang, modifier = Modifier)
-        }
-        TotalCard(total)
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Recent Expenses",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.fillMaxWidth(0.9f)
-            )
-            AddExpenseButton(
-                showSheet = setShowDialog,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-        ExpenseList(expenses)
+    Column {
+        Text(
+            text = "Welcome. Sang",
+            style = MaterialTheme.typography.titleLarge,
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        ImageProfile(imageRes = R.drawable.sang, modifier = Modifier)
     }
+    TotalCard(total)
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Recent Expenses",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.fillMaxWidth(0.9f)
+        )
+        AddExpenseButton(
+            showSheet = setShowDialog,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+    ExpenseList(expenses)
 
     if (showDialog) {
         Dialog(
