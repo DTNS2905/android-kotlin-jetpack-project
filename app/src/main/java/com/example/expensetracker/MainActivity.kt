@@ -4,16 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,8 +15,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.expensetracker.room.database.DatabaseProvider
 import com.example.expensetracker.room.repository.ExpenseRepository
+import com.example.expensetracker.ui.components.ExpenseDetailScreen
 import com.example.expensetracker.ui.layouts.GeneralLayout
-import com.example.expensetracker.ui.components.Routes
 import com.example.expensetracker.ui.layouts.ScreenLayout
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.example.expensetracker.ui.screens.HomeScreen
@@ -40,6 +34,12 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+object Routes {
+    const val HOME = "home"
+    const val PROFILE = "profile"
+    const val EXPENSEDETAIL = "expense/{id}"
 }
 
 @Composable
@@ -61,18 +61,30 @@ fun App() {
         NavHost(
             navController = navController,
             startDestination = Routes.HOME,
-
             ) {
             composable(Routes.HOME) {
                 ScreenLayout(paddingValues) {
-                    HomeScreen(expenseViewModel)
+                    HomeScreen(expenseViewModel, navController)
                 }
 
             }
+
             composable(Routes.PROFILE) {
                 ScreenLayout(paddingValues) {
                     ProfileScreen()
                 }
+            }
+
+            composable(Routes.EXPENSEDETAIL) { backStackEntry ->
+                val id = backStackEntry.arguments?.getString("id")?.toInt() ?:0
+
+                ExpenseDetailScreen(
+                    id,
+                    expenseViewModel,
+                    {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }

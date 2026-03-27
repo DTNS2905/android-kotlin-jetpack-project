@@ -17,13 +17,15 @@ fun CustomList(
     expenses: List<Expense>,
     itemSpacing: Dp = 20.dp,
     modifier: Modifier,
+    onClick: (Int) -> Unit = {}
+
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(itemSpacing)
     ) {
         items(expenses, key = { it.id }) { expense ->
-            ExpenseItem(expense)
+            ExpenseItem(expense, onClick)
         }
     }
 }

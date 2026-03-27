@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.example.expensetracker.room.model.Expense
 import kotlinx.coroutines.flow.Flow
 
@@ -20,6 +21,9 @@ interface ExpenseDao {
 
     @Insert
     suspend fun insertExpense(expense: Expense)
+
+    @Update
+    suspend fun updateExpense(expense: Expense)
 
     @Delete
     suspend fun deleteExpense(expense: Expense)

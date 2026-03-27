@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import com.example.expensetracker.Routes
 import com.example.expensetracker.ui.components.MenuBar
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 
@@ -15,7 +16,11 @@ fun GeneralLayout(
     content: @Composable (paddingValues: PaddingValues) -> Unit,
 ) {
     Scaffold(
-        bottomBar = { MenuBar(navController, currentRoute, ) },
+        bottomBar = {
+            if (currentRoute != Routes.EXPENSEDETAIL) {
+                MenuBar(navController, currentRoute)
+            }
+        },
         containerColor = MaterialTheme.colorScheme.background
 
     ) { paddingValues ->

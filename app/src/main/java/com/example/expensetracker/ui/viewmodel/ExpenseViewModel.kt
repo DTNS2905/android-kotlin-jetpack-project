@@ -5,16 +5,48 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.expensetracker.room.model.Expense
 import com.example.expensetracker.room.repository.ExpenseRepository
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+sealed class ExpenseDetailState {
+    object Loading : ExpenseDetailState()
+    data class Success(
+        val expense: Expense
+    ) : ExpenseDetailState()
+    object NotFound : ExpenseDetailState()
+}
+
 class ExpenseViewModel(
     private val repository: ExpenseRepository
 ) : ViewModel() {
+
+    private val _selectedId = MutableStateFlow<Int?>(null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val expenseDetailState: StateFlow<ExpenseDetailState> = _selectedId
+            .filterNotNull()
+            .flatMapLatest { id ->
+            repository.getExpenseId(id).map { expense ->
+                if (expense != null) ExpenseDetailState.Success(expense)
+                else ExpenseDetailState.NotFound
+            }
+        }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                ExpenseDetailState.Loading
+            )
+
+    fun loadExpense(id: Int) {
+        _selectedId.value = id
+    }
 
     val allExpenses: StateFlow<List<Expense>> = repository.allExpenses
         .stateIn(
@@ -29,16 +61,6 @@ class ExpenseViewModel(
             SharingStarted.WhileSubscribed(5000),
             0.0
         )
-
-    fun getExpense(id: Int): StateFlow<Expense?> {
-        return repository
-            .getExpenseId(id)
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
-                null
-            )
-    }
 
     fun addExpense(title: String, amount: Double) {
         viewModelScope.launch {
@@ -56,6 +78,12 @@ class ExpenseViewModel(
     fun deleteExpense(expense: Expense) {
         viewModelScope.launch {
             repository.delete(expense)
+        }
+    }
+
+    fun updateExpense(expense: Expense) {
+        viewModelScope.launch {
+            repository.update(expense)
         }
     }
 }

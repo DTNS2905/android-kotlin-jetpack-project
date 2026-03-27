@@ -45,6 +45,11 @@ fun TotalCard(totalAmount: Double) {
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
+                Text(
+                    text = "This month",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+                )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = formatDollar(totalAmount),

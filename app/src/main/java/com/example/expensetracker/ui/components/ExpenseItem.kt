@@ -31,12 +31,18 @@ import com.example.expensetracker.utils.formatDate
 import com.example.expensetracker.utils.formatDollar
 
 @Composable
-fun ExpenseItem(item: Expense) {
+fun ExpenseItem(
+    item: Expense,
+    onClick: (Int) -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        onClick = {
+            onClick(item.id)
+        }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -83,5 +89,8 @@ fun ExpenseItem(item: Expense) {
 @Preview(showBackground = true)
 @Composable
 fun ExpenseItemPreview() {
-    ExpenseItem(Expense(1, "Groceries", 45.50, System.currentTimeMillis()))
+    ExpenseItem(
+        item = Expense(1, "Groceries", 45.50, System.currentTimeMillis()),
+        onClick = {}
+    )
 }
