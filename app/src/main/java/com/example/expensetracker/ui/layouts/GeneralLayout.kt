@@ -17,7 +17,7 @@ fun GeneralLayout(
 ) {
     Scaffold(
         bottomBar = {
-            if (currentRoute != Routes.EXPENSEDETAIL) {
+            if (currentRoute in Routes.bottomBarRoutes) {
                 MenuBar(navController, currentRoute)
             }
         },

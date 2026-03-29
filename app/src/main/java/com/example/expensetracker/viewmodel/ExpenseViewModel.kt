@@ -1,14 +1,18 @@
-package com.example.expensetracker.ui.viewmodel
+package com.example.expensetracker.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.expensetracker.room.model.Expense
 import com.example.expensetracker.room.repository.ExpenseRepository
+import com.example.expensetracker.ui.components.MessageType
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -23,11 +27,24 @@ sealed class ExpenseDetailState {
     object NotFound : ExpenseDetailState()
 }
 
+sealed class UiEvent {
+    data class ShowMessage(val message: String, val type: MessageType) : UiEvent()
+}
+
 class ExpenseViewModel(
     private val repository: ExpenseRepository
 ) : ViewModel() {
 
     private val _selectedId = MutableStateFlow<Int?>(null)
+
+    private val _uiEvent = MutableSharedFlow<UiEvent>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+
+    val uiEvent = _uiEvent.asSharedFlow()
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val expenseDetailState: StateFlow<ExpenseDetailState> = _selectedId
@@ -70,6 +87,13 @@ class ExpenseViewModel(
                     title = title,
                     amount = amount,
                     date = System.currentTimeMillis()
+                )
+            )
+            _uiEvent.emit(
+                UiEvent
+                    .ShowMessage(
+                        "Expense added successfully",
+                        MessageType.SUCCESS
                 )
             )
         }

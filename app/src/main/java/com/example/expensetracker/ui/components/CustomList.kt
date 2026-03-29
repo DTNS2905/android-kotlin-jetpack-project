@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.expensetracker.data.exampleExpenseList
 import com.example.expensetracker.room.model.Expense
+import com.example.expensetracker.ui.screens.home.components.ExpenseItem
 
 @Composable
 fun CustomList(

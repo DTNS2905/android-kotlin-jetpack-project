@@ -1,4 +1,4 @@
-package com.example.expensetracker.ui.components
+package com.example.expensetracker.ui.screens.home.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -43,13 +43,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.expensetracker.ui.viewmodel.ExpenseDetailState
-import com.example.expensetracker.ui.viewmodel.ExpenseViewModel
+import com.example.expensetracker.utils.ValidationField
+import com.example.expensetracker.utils.amountRules
+import com.example.expensetracker.viewmodel.ExpenseDetailState
+import com.example.expensetracker.viewmodel.ExpenseViewModel
 import com.example.expensetracker.utils.formatDate
 import com.example.expensetracker.utils.formatDollar
+import com.example.expensetracker.utils.titleRules
+import com.example.expensetracker.utils.validate
+import com.example.expensetracker.utils.validateAllFields
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +67,16 @@ fun ExpenseDetailScreen(
     val state by expenseViewModel.expenseDetailState.collectAsState()
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
+    var titleError = validate(title, titleRules)
+    var amountError = validate(amount, amountRules)
     var isEditing by remember { mutableStateOf(false) }
+
+    val isFormValid = validateAllFields(
+        listOf(
+            ValidationField(title, titleRules) { titleError = it },
+            ValidationField(amount, amountRules) { amountError = it }
+        )
+    )
 
     LaunchedEffect(expenseId) {
         expenseViewModel.loadExpense(expenseId)
@@ -206,16 +221,24 @@ fun ExpenseDetailScreen(
                                 style = MaterialTheme.typography.titleMedium
                             )
                             OutlinedTextField(
-                                value = title,
-                                onValueChange = { title = it },
                                 label = { Text("Title") },
+                                value = title,
+                                onValueChange = { newTitle -> title = newTitle; titleError = null },
+                                isError = titleError != null,
+                                supportingText = {
+                                    titleError?.let { Text(it, color = MaterialTheme.colorScheme.error)}
+                                },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true
                             )
                             OutlinedTextField(
-                                value = amount,
-                                onValueChange = { amount = it },
                                 label = { Text("Amount") },
+                                value = amount,
+                                onValueChange = { newAmount -> amount = newAmount; amountError = null },
+                                isError = amountError != null,
+                                supportingText = {
+                                    amountError?.let { Text(it, color = MaterialTheme.colorScheme.error)}
+                                },
                                 modifier = Modifier.fillMaxWidth(),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                 singleLine = true,
@@ -230,10 +253,9 @@ fun ExpenseDetailScreen(
                                 }
                                 Button(
                                     onClick = {
-                                        val parsedAmount = amount.toDoubleOrNull()
-                                        if (title.isNotBlank() && parsedAmount != null && parsedAmount > 0) {
+                                        if (isFormValid) {
                                             expenseViewModel.updateExpense(
-                                                expense.copy(title = title, amount = parsedAmount)
+                                                expense.copy(title = title, amount = amount.toDouble())
                                             )
                                             isEditing = false
                                         }
@@ -267,7 +289,7 @@ fun ExpenseDetailScreen(
                         contentColor = MaterialTheme.colorScheme.error
                     ),
                     border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                        brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.error)
+                        brush = SolidColor(MaterialTheme.colorScheme.error)
                     )
                 ) {
                     Text("Delete Expense")
