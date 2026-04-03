@@ -27,4 +27,7 @@ interface ExpenseDao {
 
     @Delete
     suspend fun deleteExpense(expense: Expense)
+
+    @Query("SELECT * FROM expenses WHERE date >= :from AND date <= :to ORDER BY date DESC")
+    fun getExpenseFrom(from: Long, to: Long): Flow<List<Expense>>
 }

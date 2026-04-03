@@ -50,7 +50,7 @@ fun MenuBar(
 ) {
     val items = listOf(
         MenuItem(Routes.HOME, "Home", Icons.Outlined.Home, Icons.Filled.Home),
-        MenuItem(Routes.PROFILE, "Profile", Icons.Outlined.Person, Icons.Filled.Person),
+        MenuItem(Routes.SETTING, "Setting", Icons.Outlined.Person, Icons.Filled.Person),
     )
 
     Surface(

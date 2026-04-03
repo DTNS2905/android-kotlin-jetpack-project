@@ -40,9 +40,7 @@ fun ExpenseItem(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        onClick = {
-            onClick(item.id)
-        }
+        onClick = { onClick(item.id) }
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -69,7 +67,7 @@ fun ExpenseItem(
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold
                 )
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
                 Text(
                     text = formatDate(item.date),
                     style = MaterialTheme.typography.bodySmall,

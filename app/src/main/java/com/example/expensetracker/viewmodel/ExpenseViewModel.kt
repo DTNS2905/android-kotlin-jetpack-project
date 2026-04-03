@@ -3,9 +3,12 @@ package com.example.expensetracker.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.room.Update
+import com.example.expensetracker.constants.TimeFilter
 import com.example.expensetracker.room.model.Expense
 import com.example.expensetracker.room.repository.ExpenseRepository
 import com.example.expensetracker.ui.components.MessageType
+import com.example.expensetracker.utils.toTimeRange
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,10 +16,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed class ExpenseDetailState {
@@ -31,6 +36,10 @@ sealed class UiEvent {
     data class ShowMessage(val message: String, val type: MessageType) : UiEvent()
 }
 
+data class Fillters (
+    val time: TimeFilter
+)
+
 class ExpenseViewModel(
     private val repository: ExpenseRepository
 ) : ViewModel() {
@@ -43,8 +52,19 @@ class ExpenseViewModel(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
+    private val _selectedFilters = MutableStateFlow(Fillters(TimeFilter.ALL))
+
     val uiEvent = _uiEvent.asSharedFlow()
 
+    val selectedFilter = _selectedFilters.asStateFlow()
+
+    fun loadExpense(id: Int) {
+        _selectedId.value = id
+    }
+
+    fun setFilter( update: (Fillters) -> Fillters) {
+        _selectedFilters.update {  update(it) }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val expenseDetailState: StateFlow<ExpenseDetailState> = _selectedId
@@ -61,12 +81,18 @@ class ExpenseViewModel(
                 ExpenseDetailState.Loading
             )
 
-    fun loadExpense(id: Int) {
-        _selectedId.value = id
-    }
-
-    val allExpenses: StateFlow<List<Expense>> = repository.allExpenses
+    val getAllExpenses: StateFlow<List<Expense>> = repository.allExpenses
         .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList()
+        )
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val getAllFilteredExpenses: StateFlow<List<Expense>> =
+        selectedFilter.flatMapLatest { filter ->
+            val (from, to) = filter.time.toTimeRange()
+            repository.getExpenseFrom(from, to)
+        }. stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyList()
@@ -79,14 +105,15 @@ class ExpenseViewModel(
             0.0
         )
 
-    fun addExpense(title: String, amount: Double) {
+    fun addExpense(title: String, amount: Double, categoryId: Int) {
         viewModelScope.launch {
 
             repository.insert(
                 Expense(
                     title = title,
                     amount = amount,
-                    date = System.currentTimeMillis()
+                    date = System.currentTimeMillis(),
+                    categoryId = categoryId
                 )
             )
             _uiEvent.emit(

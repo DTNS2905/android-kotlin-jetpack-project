@@ -15,12 +15,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.expensetracker.room.database.DatabaseProvider
 import com.example.expensetracker.room.repository.ExpenseRepository
-import com.example.expensetracker.ui.screens.home.components.ExpenseDetailScreen
 import com.example.expensetracker.ui.layouts.GeneralLayout
 import com.example.expensetracker.ui.layouts.ScreenLayout
-import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.example.expensetracker.ui.screens.home.HomeScreen
-import com.example.expensetracker.ui.screens.ProfileScreen
+import com.example.expensetracker.ui.screens.home.components.ExpenseDetailScreen
+import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
+import com.example.expensetracker.ui.screens.setting.SettingScreen
 import com.example.expensetracker.viewmodel.ExpenseViewModel
 import com.example.expensetracker.viewmodel.ExpenseViewModelFactory
 
@@ -38,10 +38,10 @@ class MainActivity : ComponentActivity() {
 
 object Routes {
     const val HOME = "home"
-    const val PROFILE = "profile"
+    const val SETTING = "setting"
     const val EXPENSEDETAIL = "expense/{id}"
 
-    val bottomBarRoutes = setOf(HOME, PROFILE)
+    val bottomBarRoutes = setOf(HOME, SETTING)
 }
 
 @Composable
@@ -71,9 +71,9 @@ fun App() {
 
             }
 
-            composable(Routes.PROFILE) {
+            composable(Routes.SETTING) {
                 ScreenLayout(paddingValues) {
-                    ProfileScreen()
+                    SettingScreen()
                 }
             }
 

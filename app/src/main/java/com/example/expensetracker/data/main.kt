@@ -1,5 +1,6 @@
 package com.example.expensetracker.data
 
+import androidx.compose.ui.graphics.Color
 import com.example.expensetracker.room.model.Expense
 
 val exampleExpenseList = listOf(
@@ -9,4 +10,13 @@ val exampleExpenseList = listOf(
     Expense(4, "Internet Bill", 30.0, 1742256000000L),
     Expense(5, "Movie", 12.0, 1742169600000L),
     Expense(6, "Snacks", 8.50, 1742169600000L)
+)
+
+val colorsForPicker = listOf(
+    Color.Blue,
+    Color.Red,
+    Color.Green,
+    Color.Cyan,
+    Color.DarkGray,
+    Color.Magenta
 )
