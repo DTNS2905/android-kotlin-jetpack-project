@@ -17,8 +17,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -36,8 +38,9 @@ sealed class UiEvent {
     data class ShowMessage(val message: String, val type: MessageType) : UiEvent()
 }
 
-data class Fillters (
-    val time: TimeFilter
+data class Fillters(
+    val time: TimeFilter,
+    val categoryId: Int? = null
 )
 
 class ExpenseViewModel(
@@ -54,9 +57,13 @@ class ExpenseViewModel(
 
     private val _selectedFilters = MutableStateFlow(Fillters(TimeFilter.ALL))
 
+    private val _searchQuery = MutableStateFlow("")
+
     val uiEvent = _uiEvent.asSharedFlow()
 
     val selectedFilter = _selectedFilters.asStateFlow()
+
+    val searchQuery = _searchQuery.asStateFlow()
 
     fun loadExpense(id: Int) {
         _selectedId.value = id
@@ -64,6 +71,10 @@ class ExpenseViewModel(
 
     fun setFilter( update: (Fillters) -> Fillters) {
         _selectedFilters.update {  update(it) }
+    }
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -90,9 +101,13 @@ class ExpenseViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     val getAllFilteredExpenses: StateFlow<List<Expense>> =
         selectedFilter.flatMapLatest { filter ->
-            val (from, to) = filter.time.toTimeRange()
-            repository.getExpenseFrom(from, to)
-        }. stateIn(
+            if (filter.time == TimeFilter.ALL) {
+                repository.getAllExpenses(filter.categoryId)
+            } else {
+                val (from, to) = filter.time.toTimeRange()
+                repository.getExpenseFrom(from, to, filter.categoryId)
+            }
+        }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             emptyList()
@@ -105,9 +120,25 @@ class ExpenseViewModel(
             0.0
         )
 
-    fun addExpense(title: String, amount: Double, categoryId: Int) {
-        viewModelScope.launch {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val searchResults: StateFlow<List<Expense>> =
+        combine(_searchQuery, _selectedFilters)
+        {query, filters -> query to filters}
+        .flatMapLatest { (query, filters) ->
+            if (query.isBlank()) {
+                flowOf(emptyList())
+            } else {
+                val (from, to) = filters.time.toTimeRange()
+                repository.searchExpense(query, from, to, filters.categoryId)
+            }
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            emptyList()
+        )
 
+    fun addExpense(title: String, amount: Double, categoryId: Int?) {
+        viewModelScope.launch {
             repository.insert(
                 Expense(
                     title = title,
@@ -137,6 +168,8 @@ class ExpenseViewModel(
             repository.update(expense)
         }
     }
+
+
 }
 
 class ExpenseViewModelFactory(private val repository: ExpenseRepository) : ViewModelProvider.Factory {

@@ -13,8 +13,11 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.expensetracker.constants.TimeFilter
+import com.example.expensetracker.room.model.Category
+import com.example.expensetracker.ui.components.CategoryChip
 import com.example.expensetracker.utils.toLabel
 import com.example.expensetracker.viewmodel.Fillters
 
@@ -22,6 +25,7 @@ import com.example.expensetracker.viewmodel.Fillters
 @Composable
 fun FilterBottomSheet(
     selectedFilters: Fillters,
+    categories: List<Category>,
     onFilterUpdate: (Fillters) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -44,7 +48,7 @@ fun FilterBottomSheet(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 TimeFilter.entries.forEach { filter ->
                     FilterChip(
                         selected = selectedFilters.time == filter,
@@ -53,6 +57,34 @@ fun FilterBottomSheet(
                     )
                 }
             }
+
+            if (categories.isNotEmpty()) {
+                Text(
+                    "Category",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    FilterChip(
+                        selected = selectedFilters.categoryId == null,
+                        onClick = { onFilterUpdate(selectedFilters.copy(categoryId = null)) },
+                        label = { Text("All") }
+                    )
+                    categories.forEach { category ->
+                        val color = Color(category.color.toInt())
+                        CategoryChip(
+                            name = category.title,
+                            color = color,
+                            selected = selectedFilters.categoryId == category.id,
+                            onClick = { onFilterUpdate(selectedFilters.copy(categoryId = category.id)) }
+                        )
+                    }
+                }
+            }
+
         }
     }
 }

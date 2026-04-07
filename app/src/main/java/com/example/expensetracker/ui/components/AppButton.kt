@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 
 enum class ButtonVariant {
     PRIMARY,    // filled — confirm, save, add
@@ -69,13 +70,15 @@ fun AppButton(
 @Preview(showBackground = true)
 @Composable
 fun AppButtonPreview() {
-    androidx.compose.foundation.layout.Column(
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
-        modifier = Modifier.then(Modifier)
-    ) {
-        AppButton(text = "Confirm", onClick = {}, variant = ButtonVariant.PRIMARY)
-        AppButton(text = "Cancel", onClick = {}, variant = ButtonVariant.SECONDARY)
-        AppButton(text = "Delete", onClick = {}, variant = ButtonVariant.DANGER)
-        AppButton(text = "Skip", onClick = {}, variant = ButtonVariant.GHOST)
+    ExpenseTrackerTheme {
+        androidx.compose.foundation.layout.Column(
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp),
+            modifier = Modifier.then(Modifier)
+        ) {
+            AppButton(text = "Confirm", onClick = {}, variant = ButtonVariant.PRIMARY)
+            AppButton(text = "Cancel", onClick = {}, variant = ButtonVariant.SECONDARY)
+            AppButton(text = "Delete", onClick = {}, variant = ButtonVariant.DANGER)
+            AppButton(text = "Skip", onClick = {}, variant = ButtonVariant.GHOST)
+        }
     }
 }

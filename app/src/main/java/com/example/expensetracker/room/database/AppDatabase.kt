@@ -4,14 +4,18 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.expensetracker.room.dao.CategoryDao
 import com.example.expensetracker.room.dao.ExpenseDao
+import com.example.expensetracker.room.dao.SettingDao
 import com.example.expensetracker.room.model.Category
 import com.example.expensetracker.room.model.Expense
+import com.example.expensetracker.room.model.Settings
 
 @Database(
-    entities = [Expense::class, Category::class],
-    version = 2
+    entities = [Expense::class, Category::class, Settings::class],
+    version = 3
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
     abstract fun categoryDao(): CategoryDao
+
+    abstract fun settingDao(): SettingDao
 }

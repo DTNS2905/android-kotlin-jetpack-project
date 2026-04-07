@@ -2,14 +2,12 @@ package com.example.expensetracker.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.expensetracker.data.exampleExpenseList
+import com.example.expensetracker.room.model.Category
 import com.example.expensetracker.room.model.Expense
 import com.example.expensetracker.ui.screens.home.components.ExpenseItem
 
@@ -17,21 +15,19 @@ import com.example.expensetracker.ui.screens.home.components.ExpenseItem
 fun CustomList(
     expenses: List<Expense>,
     modifier: Modifier,
+    categories: List<Category> = emptyList(),
     onClick: (Int) -> Unit = {}
 ) {
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         items(expenses, key = { it.id }) { expense ->
-            ExpenseItem(expense, onClick)
+            ExpenseItem(
+                item = expense,
+                onClick = onClick,
+                category = categories.find { it.id == expense.categoryId }
+            )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ExpenseItemListPreview() {
-    CustomList(expenses = exampleExpenseList, modifier = Modifier)
 }

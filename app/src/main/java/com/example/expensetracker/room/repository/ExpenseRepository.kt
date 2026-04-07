@@ -17,5 +17,11 @@ class ExpenseRepository(private val dao: ExpenseDao) {
 
     suspend fun delete(expense: Expense) = dao.deleteExpense(expense)
 
-    fun getExpenseFrom(from: Long, to: Long) = dao.getExpenseFrom(from, to)
+    fun getAllExpenses(categoryId: Int?) = dao.getAllExpenses(categoryId)
+
+    fun getExpenseFrom(from: Long, to: Long, categoryId: Int?) =
+        dao.getExpenseFrom(from, to, categoryId)
+
+    fun searchExpense(query: String, from: Long, to: Long, categoryId: Int?) =
+        dao.searchExpense(query, from, to, categoryId)
 }

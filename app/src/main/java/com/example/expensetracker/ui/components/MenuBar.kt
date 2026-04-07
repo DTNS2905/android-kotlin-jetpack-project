@@ -20,8 +20,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -50,7 +54,8 @@ fun MenuBar(
 ) {
     val items = listOf(
         MenuItem(Routes.HOME, "Home", Icons.Outlined.Home, Icons.Filled.Home),
-        MenuItem(Routes.SETTING, "Setting", Icons.Outlined.Person, Icons.Filled.Person),
+        MenuItem(Routes.SETTING, "Setting", Icons.Outlined.Settings, Icons.Filled.Settings),
+        MenuItem(Routes.SEARCH, "Search", Icons.Outlined.Search, Icons.Filled.Search),
     )
 
     Surface(

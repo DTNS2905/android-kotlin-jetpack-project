@@ -1,6 +1,7 @@
 package com.example.expensetracker.ui.screens.home.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,17 +24,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.expensetracker.room.model.Category
 import com.example.expensetracker.room.model.Expense
+import com.example.expensetracker.ui.components.CategoryChip
 import com.example.expensetracker.utils.formatDate
 import com.example.expensetracker.utils.formatDollar
 
 @Composable
 fun ExpenseItem(
     item: Expense,
-    onClick: (Int) -> Unit
+    onClick: (Int) -> Unit,
+    category: Category? = null
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -61,19 +66,33 @@ fun ExpenseItem(
                 )
             }
             Spacer(Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 Text(
                     text = item.title,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold
                 )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = formatDate(item.date),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = formatDate(item.date),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    category?.let {
+                        CategoryChip(
+                            name = it.title,
+                            color = Color(it.color.toInt())
+                        )
+                    }
+                }
             }
+            Spacer(Modifier.width(8.dp))
             Text(
                 text = "- ${formatDollar(item.amount)}",
                 style = MaterialTheme.typography.bodyLarge,
@@ -88,7 +107,8 @@ fun ExpenseItem(
 @Composable
 fun ExpenseItemPreview() {
     ExpenseItem(
-        item = Expense(1, "Groceries", 45.50, System.currentTimeMillis()),
-        onClick = {}
+        item = Expense(1, "Groceries", 45.50, System.currentTimeMillis(), null),
+        onClick = {},
+        category = Category(1, "Food", Color.Green.value.toLong())
     )
 }
