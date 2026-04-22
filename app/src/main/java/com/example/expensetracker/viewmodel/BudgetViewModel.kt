@@ -3,16 +3,18 @@ package com.example.expensetracker.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.expensetracker.constants.TimeFilter
 import com.example.expensetracker.room.model.Settings
 import com.example.expensetracker.room.repository.ExpenseRepository
 import com.example.expensetracker.room.repository.SettingsRepository
+import com.example.expensetracker.utils.toTimeRange
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-data class BugetState(
+data class BudgetState(
     val budget: Double = 0.0,
     val spent: Double = 0.0,
     val alertThreshold: Int = 80
@@ -28,20 +30,22 @@ class BudgetViewModel (
     private val settingsRepository: SettingsRepository
 ): ViewModel() {
 
-    val budgetState: StateFlow<BugetState> = combine(
-        expenseRepository.totalAmount,
+    val budgetState: StateFlow<BudgetState> = combine(
+        expenseRepository.getTotalAmountForPeriod(
+            from = TimeFilter.THIS_MONTH.toTimeRange().first,
+            to = TimeFilter.THIS_MONTH.toTimeRange().second
+        ),
         settingsRepository.settings
     ) { spent, settings ->
-        BugetState(
+        BudgetState(
             budget = settings.monthlyBudget,
             spent = spent ?: 0.0,
             alertThreshold = settings.budgetAlert
-
         )
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        BugetState()
+        BudgetState()
     )
 
     fun updateSettings(

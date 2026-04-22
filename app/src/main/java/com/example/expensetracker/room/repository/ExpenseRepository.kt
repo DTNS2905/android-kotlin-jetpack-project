@@ -24,4 +24,7 @@ class ExpenseRepository(private val dao: ExpenseDao) {
 
     fun searchExpense(query: String, from: Long, to: Long, categoryId: Int?) =
         dao.searchExpense(query, from, to, categoryId)
+
+    fun getTotalAmountForPeriod(from: Long, to: Long): Flow<Double?> =
+        dao.getTotalAmountForPeriod(from, to)
 }

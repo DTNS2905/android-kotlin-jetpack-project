@@ -36,4 +36,7 @@ interface ExpenseDao {
 
     @Query("SELECT * FROM expenses WHERE title LIKE '%' || :query || '%' AND (:categoryId IS NULL OR categoryId = :categoryId) AND date >= :from AND date <= :to ORDER BY date DESC")
     fun searchExpense(query: String, from: Long, to: Long, categoryId: Int?): Flow<List<Expense>>
+
+    @Query("SELECT SUM(amount) FROM expenses WHERE date >= :from AND date <= :to")
+    fun getTotalAmountForPeriod(from: Long, to: Long): Flow<Double?>
 }
