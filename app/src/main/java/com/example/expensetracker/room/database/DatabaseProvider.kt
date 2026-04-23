@@ -12,7 +12,9 @@ object DatabaseProvider {
                         context.applicationContext,
                         AppDatabase::class.java,
                         "expense_db"
-                    ).fallbackToDestructiveMigration(false).build()
+                    )
+                    .addMigrations(AppDatabase.MIGRATION_3_4)
+                    .fallbackToDestructiveMigration(false).build()
             INSTANCE = instance
             instance
         }

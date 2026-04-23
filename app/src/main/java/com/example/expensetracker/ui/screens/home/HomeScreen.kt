@@ -10,6 +10,9 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import com.example.expensetracker.ui.components.MessageType
 import com.example.expensetracker.ui.screens.home.components.HomeContent
+import com.example.expensetracker.ui.screens.home.components.HomeUiActions
+import com.example.expensetracker.ui.screens.home.components.HomeUiState
+import com.example.expensetracker.viewmodel.BudgetViewModel
 import com.example.expensetracker.viewmodel.CategoryViewModel
 import com.example.expensetracker.viewmodel.ExpenseViewModel
 import com.example.expensetracker.viewmodel.UiEvent
@@ -18,17 +21,47 @@ import com.example.expensetracker.viewmodel.UiEvent
 fun HomeScreen(
     expenseViewModel: ExpenseViewModel,
     categoryViewModel: CategoryViewModel,
-    navController: NavHostController
+    budgetViewModel: BudgetViewModel,
+    navController: NavHostController,
 ) {
     val expenses by expenseViewModel.getAllFilteredExpenses.collectAsState()
     val total by expenseViewModel.totalAmount.collectAsState()
     val categories by categoryViewModel.getAllCategories.collectAsState()
     val selectedFilters by expenseViewModel.selectedFilter.collectAsState()
+    val currencySymbol by budgetViewModel.currencySymbol.collectAsState()
+    val budgetState by budgetViewModel.budgetState.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     var showFilter by remember { mutableStateOf(false) }
     var showMessage by remember { mutableStateOf(false) }
     var messageText by remember { mutableStateOf("") }
     var messageType by remember { mutableStateOf(MessageType.INFO) }
+
+    val homeUiState = HomeUiState(
+        expenses = expenses,
+        total = total,
+        categories = categories,
+        selectedFilters = selectedFilters,
+        showDialog = showDialog,
+        showFilter = showFilter,
+        showMessage = showMessage,
+        messageText = messageText,
+        messageType = messageType,
+        budgetState = budgetState,
+        currencySymbol = currencySymbol
+    )
+
+    val homeUiActions = HomeUiActions(
+        onDismissDialog = { showDialog = false },
+        onAddExpense = { title, amount, categoryId ->
+            expenseViewModel.addExpense(title, amount, categoryId)
+        },
+        onShowFilter = { showFilter = true },
+        onDismissFilter = { showFilter = false },
+        onFilterUpdate = { expenseViewModel.setFilter { _ -> it } },
+        onDismissMessage = { showMessage = false },
+        onNavigateToExpense = { id -> navController.navigate("expense/$id") },
+        onShowDialog = { showDialog = true },
+    )
 
     LaunchedEffect(Unit) {
         expenseViewModel.uiEvent.collect { event ->
@@ -43,24 +76,7 @@ fun HomeScreen(
     }
 
     HomeContent(
-        expenses = expenses,
-        total = total,
-        categories = categories,
-        selectedFilters = selectedFilters,
-        showDialog = showDialog,
-        showFilter = showFilter,
-        showMessage = showMessage,
-        messageText = messageText,
-        messageType = messageType,
-        onShowDialog = { showDialog = true },
-        onDismissDialog = { showDialog = false },
-        onAddExpense = { title, amount, categoryId ->
-            expenseViewModel.addExpense(title, amount, categoryId)
-        },
-        onShowFilter = { showFilter = true },
-        onDismissFilter = { showFilter = false },
-        onFilterUpdate = { expenseViewModel.setFilter { _ -> it } },
-        onDismissMessage = { showMessage = false },
-        onNavigateToExpense = { id -> navController.navigate("expense/$id") }
+        homeUiState,
+        homeUiActions
     )
 }

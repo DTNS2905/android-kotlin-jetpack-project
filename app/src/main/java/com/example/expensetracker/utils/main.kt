@@ -6,8 +6,8 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-fun formatDollar(num: Double): String {
-    return "$" + "%, .2f".format(num)
+fun formatDollar(num: Double, symbol: String = "$"): String {
+    return "$symbol%, .2f".format(num)
 }
 
 fun formatDate(timeStamp: Long): String {

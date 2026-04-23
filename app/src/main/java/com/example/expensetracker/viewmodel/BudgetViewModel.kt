@@ -11,6 +11,7 @@ import com.example.expensetracker.utils.toTimeRange
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -48,13 +49,22 @@ class BudgetViewModel (
         BudgetState()
     )
 
+    val currencySymbol: StateFlow<String> = settingsRepository.settings
+        .map { it.currencySymbol }
+        .stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        "$"
+    )
+
     fun updateSettings(
         budget: Double = budgetState.value.budget,
-        alertThreshold: Int = budgetState.value.alertThreshold
+        alertThreshold: Int = budgetState.value.alertThreshold,
+        currencySymbol: String = this.currencySymbol.value
     ) {
         viewModelScope.launch {
             settingsRepository.upsertSettings(
-                Settings(monthlyBudget = budget, budgetAlert = alertThreshold)
+                Settings(monthlyBudget = budget, budgetAlert = alertThreshold, currencySymbol = currencySymbol)
             )
         }
     }

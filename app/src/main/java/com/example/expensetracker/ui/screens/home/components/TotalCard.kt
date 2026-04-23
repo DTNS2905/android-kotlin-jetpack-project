@@ -18,20 +18,21 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 import com.example.expensetracker.utils.formatDollar
 
-
 @Composable
-fun TotalCard(totalAmount: Double) {
+fun TotalCard(
+    totalAmount: Double,
+    currencySymbol: String
+) {
     val gradient = Brush.horizontalGradient(
         colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.secondary)
     )
     Card(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Box(
             modifier = Modifier
@@ -39,7 +40,7 @@ fun TotalCard(totalAmount: Double) {
                 .background(gradient)
                 .padding(24.dp)
         ) {
-            Column() {
+            Column {
                 Text(
                     text = "Total Expenses",
                     style = MaterialTheme.typography.titleMedium,
@@ -52,7 +53,7 @@ fun TotalCard(totalAmount: Double) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = formatDollar(totalAmount),
+                    text = formatDollar(totalAmount, currencySymbol),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimary
@@ -64,6 +65,8 @@ fun TotalCard(totalAmount: Double) {
 
 @Preview(showBackground = true)
 @Composable
-fun TotalCardReview() {
-    TotalCard(0100.00)
+fun TotalCardPreview() {
+    ExpenseTrackerTheme {
+        TotalCard(totalAmount = 100.00, currencySymbol = "$")
+    }
 }

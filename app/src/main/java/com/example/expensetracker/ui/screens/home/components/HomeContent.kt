@@ -30,27 +30,39 @@ import com.example.expensetracker.ui.components.CustomList
 import com.example.expensetracker.ui.components.ImageProfile
 import com.example.expensetracker.ui.components.MessageType
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
+import com.example.expensetracker.viewmodel.BudgetState
 import com.example.expensetracker.viewmodel.Fillters
+
+data class HomeUiState(
+    val expenses: List<Expense>,
+    val total: Double,
+    val budgetState: BudgetState,
+    val categories: List<Category>,
+    val selectedFilters: Fillters,
+    val showDialog: Boolean,
+    val showFilter: Boolean,
+    val showMessage: Boolean,
+    val messageText: String,
+    val messageType: MessageType,
+    val currencySymbol: String
+)
+
+
+data class  HomeUiActions(
+    val onShowDialog: () -> Unit,
+    val onDismissDialog: () -> Unit,
+    val onAddExpense: (String, Double, Int?) -> Unit,
+    val onShowFilter: () -> Unit,
+    val onDismissFilter: () -> Unit,
+    val onFilterUpdate: (Fillters) -> Unit,
+    val onDismissMessage: () -> Unit,
+    val onNavigateToExpense: (Int) -> Unit
+)
 
 @Composable
 fun HomeContent(
-    expenses: List<Expense>,
-    total: Double,
-    categories: List<Category>,
-    selectedFilters: Fillters,
-    showDialog: Boolean,
-    showFilter: Boolean,
-    showMessage: Boolean,
-    messageText: String,
-    messageType: MessageType,
-    onShowDialog: () -> Unit,
-    onDismissDialog: () -> Unit,
-    onAddExpense: (String, Double, Int?) -> Unit,
-    onShowFilter: () -> Unit,
-    onDismissFilter: () -> Unit,
-    onFilterUpdate: (Fillters) -> Unit,
-    onDismissMessage: () -> Unit,
-    onNavigateToExpense: (Int) -> Unit
+    homeUiState: HomeUiState,
+    homeUiActions: HomeUiActions,
 ) {
     Box(
         modifier = Modifier
@@ -75,7 +87,9 @@ fun HomeContent(
                 ImageProfile(imageRes = R.drawable.sang, modifier = Modifier)
             }
 
-            TotalCard(total)
+            TotalCard(homeUiState.total, homeUiState.currencySymbol)
+
+            BudgetCard(homeUiState.budgetState, homeUiState.currencySymbol)
 
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(
@@ -87,48 +101,50 @@ fun HomeContent(
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         BadgedBox(badge = {
-                            if (selectedFilters.time != TimeFilter.ALL || selectedFilters.categoryId != null) Badge()
+                            if (homeUiState.selectedFilters.time != TimeFilter.ALL ||
+                                homeUiState.selectedFilters.categoryId != null
+                                ) Badge()
                         }) {
-                            IconButton(onClick = onShowFilter) {
+                            IconButton(onClick = homeUiActions.onShowFilter) {
                                 Icon(Icons.Default.FilterList, contentDescription = "Filter")
                             }
                         }
-                        AddExpenseButton(showSheet = { onShowDialog() }, modifier = Modifier)
+                        AddExpenseButton(showSheet = { homeUiActions.onShowDialog() }, modifier = Modifier)
                     }
                 }
 
                 CustomList(
-                    expenses = expenses,
+                    expenses = homeUiState.expenses,
                     modifier = Modifier.weight(1f),
-                    categories = categories,
-                    onClick = onNavigateToExpense
+                    categories = homeUiState.categories,
+                    onClick = homeUiActions.onNavigateToExpense
                 )
             }
         }
 
         AnimatedFloatingCard(
-            message = messageText,
-            type = messageType,
+            message = homeUiState.messageText,
+            type = homeUiState.messageType,
             modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp),
-            show = showMessage,
-            onDismiss = onDismissMessage
+            show = homeUiState.showMessage,
+            onDismiss = homeUiActions.onDismissMessage
         )
     }
 
-    if (showFilter) {
+    if (homeUiState.showFilter) {
         FilterBottomSheet(
-            selectedFilters = selectedFilters,
-            onFilterUpdate = onFilterUpdate,
-            onDismiss = onDismissFilter,
-            categories = categories
+            selectedFilters = homeUiState.selectedFilters,
+            onFilterUpdate = homeUiActions.onFilterUpdate,
+            onDismiss = homeUiActions.onDismissFilter,
+            categories = homeUiState.categories
         )
     }
 
-    if (showDialog) {
+    if (homeUiState.showDialog) {
         AddExpenseDialog(
-            categories = categories,
-            showDialog = { onDismissDialog() },
-            onAdd = onAddExpense
+            categories = homeUiState.categories,
+            showDialog = { homeUiActions.onDismissDialog() },
+            onAdd = homeUiActions.onAddExpense
         )
     }
 }
@@ -138,21 +154,28 @@ fun HomeContent(
 private fun HomeContentPreview() {
     ExpenseTrackerTheme {
         HomeContent(
-            expenses = emptyList(),
-            total = 1240.0,
-            categories = listOf(
-                Category(id = 1, title = "Food", color = 0xFF4CAF50),
-                Category(id = 2, title = "Transport", color = 0xFF2196F3)
+            homeUiState = HomeUiState(
+                expenses = emptyList(),
+                total = 1240.0,
+                categories = listOf(
+                    Category(id = 1, title = "Food", color = 0xFF4CAF50),
+                    Category(id = 2, title = "Transport", color = 0xFF2196F3)
+                ),
+                selectedFilters = Fillters(TimeFilter.ALL),
+                showDialog = false,
+                showFilter = false,
+                showMessage = false,
+                messageText = "",
+                messageType = MessageType.INFO,
+                budgetState = BudgetState(budget = 2000.0, spent = 1240.0, alertThreshold = 80),
+                currencySymbol = "$"
             ),
-            selectedFilters = Fillters(TimeFilter.ALL),
-            showDialog = false,
-            showFilter = false,
-            showMessage = false,
-            messageText = "",
-            messageType = MessageType.INFO,
-            onShowDialog = {}, onDismissDialog = {}, onAddExpense = { _, _, _ -> },
-            onShowFilter = {}, onDismissFilter = {}, onFilterUpdate = {},
-            onDismissMessage = {}, onNavigateToExpense = {}
+            homeUiActions = HomeUiActions(
+                onShowDialog = {}, onDismissDialog = {}, onAddExpense = { _, _, _ -> },
+                onShowFilter = {}, onDismissFilter = {}, onFilterUpdate = {},
+                onDismissMessage = {},
+                onNavigateToExpense = {},
+            ),
         )
     }
 }

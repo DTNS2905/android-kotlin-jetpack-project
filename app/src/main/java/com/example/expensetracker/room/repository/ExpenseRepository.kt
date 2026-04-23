@@ -17,6 +17,8 @@ class ExpenseRepository(private val dao: ExpenseDao) {
 
     suspend fun delete(expense: Expense) = dao.deleteExpense(expense)
 
+    suspend fun deleteAllExpense() = dao.deleteAllExpenses()
+
     fun getAllExpenses(categoryId: Int?) = dao.getAllExpenses(categoryId)
 
     fun getExpenseFrom(from: Long, to: Long, categoryId: Int?) =

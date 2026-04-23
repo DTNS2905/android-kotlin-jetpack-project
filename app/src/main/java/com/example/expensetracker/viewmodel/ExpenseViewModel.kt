@@ -163,6 +163,13 @@ class ExpenseViewModel(
         }
     }
 
+    fun deleteAllExpenses() {
+        viewModelScope.launch {
+            repository.deleteAllExpense()
+        }
+    }
+
+
     fun updateExpense(expense: Expense) {
         viewModelScope.launch {
             repository.update(expense)

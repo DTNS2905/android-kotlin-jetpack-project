@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.expensetracker.room.database.DatabaseProvider
 import com.example.expensetracker.room.repository.CategoryRepository
 import com.example.expensetracker.room.repository.ExpenseRepository
+import com.example.expensetracker.room.repository.SettingsRepository
 import com.example.expensetracker.ui.layouts.GeneralLayout
 import com.example.expensetracker.ui.layouts.ScreenLayout
 import com.example.expensetracker.ui.screens.home.HomeScreen
@@ -24,6 +25,8 @@ import com.example.expensetracker.ui.screens.search.SearchScreen
 import com.example.expensetracker.ui.screens.setting.SettingScreen
 import com.example.expensetracker.ui.screens.statistic.StatisticScreen
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
+import com.example.expensetracker.viewmodel.BudgetViewModel
+import com.example.expensetracker.viewmodel.BudgetViewModelFactory
 import com.example.expensetracker.viewmodel.CategoryViewModel
 import com.example.expensetracker.viewmodel.CategoryViewModelFactory
 import com.example.expensetracker.viewmodel.ExpenseViewModel
@@ -63,6 +66,7 @@ fun App() {
     val db = remember { DatabaseProvider.getDatabase(context) }
     val expenseRepo = remember { ExpenseRepository(db.expenseDao()) }
     val categoryRepo = remember { CategoryRepository(db.categoryDao()) }
+    val settingsRepo = remember { SettingsRepository(db.settingDao()) }
     val navController = rememberNavController()
     val currentRoute =
         navController.currentBackStackEntryAsState().value?.destination?.route
@@ -75,6 +79,10 @@ fun App() {
         factory = CategoryViewModelFactory(categoryRepo)
     )
 
+    val budgetViewModel: BudgetViewModel = viewModel(
+        factory = BudgetViewModelFactory(expenseRepo, settingsRepo)
+    )
+
     GeneralLayout(
         navController = navController,
         currentRoute = currentRoute
@@ -85,14 +93,19 @@ fun App() {
             ) {
             composable(Routes.HOME) {
                 ScreenLayout(paddingValues) {
-                    HomeScreen(expenseViewModel, categoryViewModel, navController)
+                    HomeScreen(
+                        expenseViewModel,
+                        categoryViewModel,
+                        budgetViewModel,
+                        navController,
+                    )
                 }
 
             }
 
             composable(Routes.SETTING) {
                 ScreenLayout(paddingValues) {
-                    SettingScreen(categoryViewModel)
+                    SettingScreen(categoryViewModel, budgetViewModel, expenseViewModel)
                 }
             }
 
