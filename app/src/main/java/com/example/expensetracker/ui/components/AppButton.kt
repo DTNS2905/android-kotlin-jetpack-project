@@ -25,7 +25,7 @@ enum class ButtonVariant {
 
 @Composable
 fun AppButton(
-    text: String,
+    text: String = "",
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     variant: ButtonVariant = ButtonVariant.PRIMARY,

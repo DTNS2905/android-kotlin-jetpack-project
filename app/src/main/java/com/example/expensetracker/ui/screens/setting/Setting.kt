@@ -10,19 +10,19 @@ import com.example.expensetracker.ui.screens.setting.components.SettingContent
 import com.example.expensetracker.ui.screens.setting.components.SettingDialog
 import com.example.expensetracker.ui.screens.setting.components.SettingUiActions
 import com.example.expensetracker.ui.screens.setting.components.SettingUiState
-import com.example.expensetracker.viewmodel.BudgetViewModel
+import com.example.expensetracker.viewmodel.SettingViewModel
 import com.example.expensetracker.viewmodel.CategoryViewModel
 import com.example.expensetracker.viewmodel.ExpenseViewModel
 
 @Composable
 fun SettingScreen(
     categoryViewModel: CategoryViewModel,
-    budgetViewModel: BudgetViewModel,
+    settingViewModel: SettingViewModel,
     expenseViewModel: ExpenseViewModel
 ) {
     val categories by categoryViewModel.getAllCategories.collectAsState()
-    val budgetState by budgetViewModel.budgetState.collectAsState()
-    val currencySymbol by budgetViewModel.currencySymbol.collectAsState()
+    val budgetState by settingViewModel.budgetState.collectAsState()
+    val currencySymbol by settingViewModel.currencySymbol.collectAsState()
     var activeDialog by remember { mutableStateOf<SettingDialog?>(null) }
 
     SettingContent(
@@ -41,11 +41,11 @@ fun SettingScreen(
                 activeDialog = null
             },
             onConfirmBudget = {
-                budgetViewModel.updateSettings(budget = it)
+                settingViewModel.updateSettings(budget = it)
                 activeDialog = null
             },
             onConfirmAlert = {
-                budgetViewModel.updateSettings(alertThreshold = it)
+                settingViewModel.updateSettings(alertThreshold = it)
                 activeDialog = null
             },
             onClearAllExpenses = {
@@ -53,7 +53,7 @@ fun SettingScreen(
                 activeDialog = null
             },
             onConfirmCurrency = {
-                budgetViewModel.updateSettings(currencySymbol = it)
+                settingViewModel.updateSettings(currencySymbol = it)
                 activeDialog = null
             }
         )

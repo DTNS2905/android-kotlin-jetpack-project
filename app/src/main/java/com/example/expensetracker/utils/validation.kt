@@ -34,3 +34,14 @@ val amountRules = listOf(
     ValidationRule("Amount should be greater than 0") { (it.toDoubleOrNull() ?: 0.0) <= 0 },
     ValidationRule("Amount should be less than 100 billion") { (it.toDoubleOrNull() ?: 0.0) >= 100_000_000_000.0 }
 )
+
+val budgetRules = listOf(
+    ValidationRule("Budget should not be empty") { it.isEmpty() },
+    ValidationRule("Enter a valid number") { it.toDoubleOrNull() == null },
+)
+
+val alertRules = listOf(
+    ValidationRule("Alert threshold should not be empty") { it.isEmpty() },
+    ValidationRule("Enter a valid number") { it.toIntOrNull() == null },
+    ValidationRule("Alert threshold should be between 0 and 100") { (it.toIntOrNull() ?: 0) !in 0..100 }
+)

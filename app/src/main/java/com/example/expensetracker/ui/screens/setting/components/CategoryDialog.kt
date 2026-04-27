@@ -14,8 +14,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.Category
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import com.example.expensetracker.ui.components.AppTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,12 +52,11 @@ fun CategoryDialog(
         }
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            OutlinedTextField(
+            AppTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                label = "Name",
+                modifier = Modifier.fillMaxWidth()
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

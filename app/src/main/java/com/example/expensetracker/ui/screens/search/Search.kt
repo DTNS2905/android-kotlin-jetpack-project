@@ -12,7 +12,8 @@ import com.example.expensetracker.viewmodel.ExpenseViewModel
 fun SearchScreen(
     expenseViewModel: ExpenseViewModel,
     categoryViewModel: CategoryViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    currencySymbol: String = "$"
 ) {
     val query by expenseViewModel.searchQuery.collectAsState()
     val results by expenseViewModel.searchResults.collectAsState()
@@ -22,6 +23,7 @@ fun SearchScreen(
         query = query,
         results = results,
         categories = categories,
+        currencySymbol = currencySymbol,
         onQueryChange = { expenseViewModel.setSearchQuery(it) },
         onClearQuery = { expenseViewModel.setSearchQuery("") },
         onNavigateToExpense = { id -> navController.navigate("expense/$id") }

@@ -38,7 +38,8 @@ import com.example.expensetracker.utils.formatDollar
 fun ExpenseItem(
     item: Expense,
     onClick: (Int) -> Unit,
-    category: Category? = null
+    category: Category? = null,
+    currencySymbol: String = "$"
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -94,7 +95,7 @@ fun ExpenseItem(
             }
             Spacer(Modifier.width(8.dp))
             Text(
-                text = "- ${formatDollar(item.amount)}",
+                text = "- ${formatDollar(item.amount, currencySymbol)}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.error

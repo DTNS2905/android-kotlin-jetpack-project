@@ -211,6 +211,7 @@ fun SettingContent(
             onDismiss = actions.onDismissDialog,
             onConfirm = { actions.onConfirmCurrency(it) }
         )
+        null -> Unit
     }
 }
 

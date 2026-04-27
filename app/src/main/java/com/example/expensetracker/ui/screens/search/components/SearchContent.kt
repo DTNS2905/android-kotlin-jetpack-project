@@ -30,6 +30,7 @@ fun SearchContent(
     query: String,
     results: List<Expense>,
     categories: List<Category>,
+    currencySymbol: String = "$",
     onQueryChange: (String) -> Unit,
     onClearQuery: () -> Unit,
     onNavigateToExpense: (Int) -> Unit
@@ -74,7 +75,7 @@ fun SearchContent(
             }
             else -> {
                 CustomList(expenses = results, modifier = Modifier,
-                    categories = categories, onClick = onNavigateToExpense)
+                    categories = categories, currencySymbol = currencySymbol, onClick = onNavigateToExpense)
             }
         }
     }

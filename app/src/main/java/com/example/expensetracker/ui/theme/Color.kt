@@ -25,4 +25,4 @@ val ErrorRed = Color(0xFFE53935)
 // Message types
 val SuccessGreen = Color(0xFF4CAF50)
 val WarningAmber = Color(0xFFF59E0B)
-val InfoBlue = Color(0xFF2196F3)
+val InfoBlue = Color(0xFF3B82F6)

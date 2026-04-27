@@ -3,7 +3,6 @@ package com.example.expensetracker.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.room.Update
 import com.example.expensetracker.constants.TimeFilter
 import com.example.expensetracker.room.model.Expense
 import com.example.expensetracker.room.repository.ExpenseRepository
@@ -38,7 +37,7 @@ sealed class UiEvent {
     data class ShowMessage(val message: String, val type: MessageType) : UiEvent()
 }
 
-data class Fillters(
+data class Filters(
     val time: TimeFilter,
     val categoryId: Int? = null
 )
@@ -55,7 +54,7 @@ class ExpenseViewModel(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    private val _selectedFilters = MutableStateFlow(Fillters(TimeFilter.ALL))
+    private val _selectedFilters = MutableStateFlow(Filters(TimeFilter.ALL))
 
     private val _searchQuery = MutableStateFlow("")
 
@@ -69,7 +68,7 @@ class ExpenseViewModel(
         _selectedId.value = id
     }
 
-    fun setFilter( update: (Fillters) -> Fillters) {
+    fun setFilter( update: (Filters) -> Filters) {
         _selectedFilters.update {  update(it) }
     }
 
@@ -105,7 +104,7 @@ class ExpenseViewModel(
                 repository.getAllExpenses(filter.categoryId)
             } else {
                 val (from, to) = filter.time.toTimeRange()
-                repository.getExpenseFrom(from, to, filter.categoryId)
+                repository.getExpenses(from, to, filter.categoryId)
             }
         }.stateIn(
             viewModelScope,

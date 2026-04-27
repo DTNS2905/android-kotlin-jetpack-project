@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -22,8 +21,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import com.example.expensetracker.ui.components.AppTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+
 import com.example.expensetracker.room.model.Category
 import com.example.expensetracker.room.model.Expense
 import com.example.expensetracker.ui.components.AppButton
@@ -61,7 +61,8 @@ fun ExpenseDetailContent(
     onShowAssignDialog: () -> Unit,
     onDismissAssignDialog: () -> Unit,
     onConfirmAssign: (Int?) -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    currencySymbol: String = "$"
 ) {
     Column(
         modifier = Modifier
@@ -99,7 +100,7 @@ fun ExpenseDetailContent(
                         Text(expense.title, style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold)
                         Spacer(Modifier.height(4.dp))
-                        Text("- ${formatDollar(expense.amount)}", style = MaterialTheme.typography.titleMedium,
+                        Text("- ${formatDollar(expense.amount, currencySymbol)}", style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.error)
                         Spacer(Modifier.height(2.dp))
                         Text(formatDate(expense.date), style = MaterialTheme.typography.bodySmall,
@@ -139,16 +140,22 @@ fun ExpenseDetailContent(
             ) {
                 Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("Edit Expense", style = MaterialTheme.typography.titleMedium)
-                    OutlinedTextField(label = { Text("Title") }, value = title, onValueChange = onTitleChange,
-                        isError = titleError != null,
-                        supportingText = { titleError?.let { Text(it, color = MaterialTheme.colorScheme.error) } },
-                        modifier = Modifier.fillMaxWidth(), singleLine = true)
-                    OutlinedTextField(label = { Text("Amount") }, value = amount, onValueChange = onAmountChange,
-                        isError = amountError != null,
-                        supportingText = { amountError?.let { Text(it, color = MaterialTheme.colorScheme.error) } },
-                        modifier = Modifier.fillMaxWidth(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        singleLine = true, prefix = { Text("$") })
+                    AppTextField(
+                        value = title,
+                        onValueChange = onTitleChange,
+                        label = "Title",
+                        error = titleError,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    AppTextField(
+                        value = amount,
+                        onValueChange = onAmountChange,
+                        label = "Amount",
+                        error = amountError,
+                        prefix = currencySymbol,
+                        keyboardType = KeyboardType.Decimal,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         AppButton(text = "Cancel", onClick = onCancelEdit,
                             variant = ButtonVariant.SECONDARY, modifier = Modifier.weight(1f))

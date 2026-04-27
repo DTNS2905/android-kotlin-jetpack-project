@@ -19,14 +19,14 @@ import com.example.expensetracker.constants.TimeFilter
 import com.example.expensetracker.room.model.Category
 import com.example.expensetracker.ui.components.CategoryChip
 import com.example.expensetracker.utils.toLabel
-import com.example.expensetracker.viewmodel.Fillters
+import com.example.expensetracker.viewmodel.Filters
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun FilterBottomSheet(
-    selectedFilters: Fillters,
+    selectedFilters: Filters,
     categories: List<Category>,
-    onFilterUpdate: (Fillters) -> Unit,
+    onFilterUpdate: (Filters) -> Unit,
     onDismiss: () -> Unit
 ) {
     ModalBottomSheet(onDismissRequest = onDismiss) {

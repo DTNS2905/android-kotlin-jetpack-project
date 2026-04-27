@@ -16,6 +16,7 @@ fun CustomList(
     expenses: List<Expense>,
     modifier: Modifier,
     categories: List<Category> = emptyList(),
+    currencySymbol: String = "$",
     onClick: (Int) -> Unit = {}
 ) {
     LazyColumn(
@@ -26,7 +27,8 @@ fun CustomList(
             ExpenseItem(
                 item = expense,
                 onClick = onClick,
-                category = categories.find { it.id == expense.categoryId }
+                category = categories.find { it.id == expense.categoryId },
+                currencySymbol = currencySymbol
             )
         }
     }

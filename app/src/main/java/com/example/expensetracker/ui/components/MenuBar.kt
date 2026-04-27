@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.expensetracker.Routes
+import com.example.expensetracker.navItems
 
 data class MenuItem(
     val route: String,
@@ -52,11 +53,6 @@ fun MenuBar(
     navController: NavHostController,
     currentRoute: String
 ) {
-    val items = listOf(
-        MenuItem(Routes.HOME, "Home", Icons.Outlined.Home, Icons.Filled.Home),
-        MenuItem(Routes.SETTING, "Setting", Icons.Outlined.Settings, Icons.Filled.Settings),
-        MenuItem(Routes.SEARCH, "Search", Icons.Outlined.Search, Icons.Filled.Search),
-    )
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -73,7 +69,7 @@ fun MenuBar(
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            items.forEach { item ->
+            navItems.forEach { item ->
                 val selected = currentRoute == item.route
                 MenuBarItem(
                     item = item,

@@ -10,5 +10,7 @@ data class Settings(
     @PrimaryKey val id: Int = 1,
     val monthlyBudget: Double = 0.0,
     val budgetAlert: Int = 80,
-    val currencySymbol: String = "$"
+    val currencySymbol: String = "$",
+    val name: String = "User",
+    val imagePath: String? = null,
 )

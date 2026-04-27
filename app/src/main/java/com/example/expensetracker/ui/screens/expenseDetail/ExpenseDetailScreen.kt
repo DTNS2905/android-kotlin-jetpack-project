@@ -32,7 +32,8 @@ import com.example.expensetracker.viewmodel.ExpenseViewModel
 fun ExpenseDetailScreen(
     expenseId: Int,
     expenseViewModel: ExpenseViewModel,
-    categoryViewModel: CategoryViewModel
+    categoryViewModel: CategoryViewModel,
+    currencySymbol: String = "$"
 ) {
     val state by expenseViewModel.expenseDetailState.collectAsState()
     val categories by categoryViewModel.getAllCategories.collectAsState()
@@ -102,7 +103,8 @@ fun ExpenseDetailScreen(
                     expenseViewModel.updateExpense(expense.copy(categoryId = categoryId))
                     showAssignDialog = false
                 },
-                onDelete = { expenseViewModel.deleteExpense(expense) }
+                onDelete = { expenseViewModel.deleteExpense(expense) },
+                currencySymbol = currencySymbol
             )
         }
     }

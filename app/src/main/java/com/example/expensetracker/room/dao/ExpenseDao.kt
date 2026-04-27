@@ -35,7 +35,7 @@ interface ExpenseDao {
     fun getAllExpenses(categoryId: Int?): Flow<List<Expense>>
 
     @Query("SELECT * FROM expenses WHERE date >= :from AND date <= :to AND (:categoryId IS NULL OR categoryId = :categoryId) ORDER BY date DESC")
-    fun getExpenseFrom(from: Long, to: Long, categoryId: Int?): Flow<List<Expense>>
+    fun getExpenses(from: Long, to: Long, categoryId: Int?): Flow<List<Expense>>
 
     @Query("SELECT * FROM expenses WHERE title LIKE '%' || :query || '%' AND (:categoryId IS NULL OR categoryId = :categoryId) AND date >= :from AND date <= :to ORDER BY date DESC")
     fun searchExpense(query: String, from: Long, to: Long, categoryId: Int?): Flow<List<Expense>>

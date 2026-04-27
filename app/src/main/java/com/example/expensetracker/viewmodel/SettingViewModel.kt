@@ -26,7 +26,7 @@ data class BudgetState(
 }
 
 
-class BudgetViewModel (
+class SettingViewModel (
     private val expenseRepository: ExpenseRepository,
     private val settingsRepository: SettingsRepository
 ): ViewModel() {
@@ -57,14 +57,38 @@ class BudgetViewModel (
         "$"
     )
 
+    val username: StateFlow<String> = settingsRepository.settings
+        .map { it.name }
+        .stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        "User"
+    )
+
+    val imagePath: StateFlow<String?> = settingsRepository.settings
+        .map { it.imagePath }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            null
+        )
+
     fun updateSettings(
         budget: Double = budgetState.value.budget,
         alertThreshold: Int = budgetState.value.alertThreshold,
-        currencySymbol: String = this.currencySymbol.value
+        currencySymbol: String = this.currencySymbol.value,
+        username: String = this.username.value,
+        imagePath: String? = this.imagePath.value
     ) {
         viewModelScope.launch {
             settingsRepository.upsertSettings(
-                Settings(monthlyBudget = budget, budgetAlert = alertThreshold, currencySymbol = currencySymbol)
+                Settings(
+                    monthlyBudget = budget,
+                    budgetAlert = alertThreshold,
+                    currencySymbol = currencySymbol,
+                    name = username,
+                    imagePath = imagePath
+                )
             )
         }
     }
@@ -77,6 +101,6 @@ class BudgetViewModelFactory(
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         @Suppress("UNCHECKED_CAST")
-        return BudgetViewModel(expenseRepository, settingsRepository ) as T
+        return SettingViewModel(expenseRepository, settingsRepository ) as T
     }
 }

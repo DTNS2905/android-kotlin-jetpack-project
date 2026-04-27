@@ -5,12 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddCircle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +18,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.example.expensetracker.room.model.Category
+import com.example.expensetracker.ui.components.AppTextField
 import com.example.expensetracker.ui.components.CategoryChip
 import com.example.expensetracker.ui.components.CustomDialog
 import com.example.expensetracker.utils.ValidationField
@@ -64,29 +61,21 @@ fun AddExpenseDialog(
         )
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            OutlinedTextField(
-                label = { Text("Title") },
+            AppTextField(
                 value = title,
                 onValueChange = { title = it; titleError = null },
-                isError = titleError != null,
-                supportingText = {
-                    titleError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                label = "Title",
+                error = titleError,
+                modifier = Modifier.fillMaxWidth()
             )
-            OutlinedTextField(
-                label = { Text("Amount") },
+            AppTextField(
                 value = amount,
                 onValueChange = { amount = it; amountError = null },
-                isError = amountError != null,
-                supportingText = {
-                    amountError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                singleLine = true,
-                prefix = { Text("$") }
+                label = "Amount",
+                error = amountError,
+                prefix = "$",
+                keyboardType = KeyboardType.Decimal,
+                modifier = Modifier.fillMaxWidth()
             )
             if (categories.isNotEmpty()) {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

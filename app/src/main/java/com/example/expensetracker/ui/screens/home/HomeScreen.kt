@@ -12,7 +12,7 @@ import com.example.expensetracker.ui.components.MessageType
 import com.example.expensetracker.ui.screens.home.components.HomeContent
 import com.example.expensetracker.ui.screens.home.components.HomeUiActions
 import com.example.expensetracker.ui.screens.home.components.HomeUiState
-import com.example.expensetracker.viewmodel.BudgetViewModel
+import com.example.expensetracker.viewmodel.SettingViewModel
 import com.example.expensetracker.viewmodel.CategoryViewModel
 import com.example.expensetracker.viewmodel.ExpenseViewModel
 import com.example.expensetracker.viewmodel.UiEvent
@@ -21,15 +21,18 @@ import com.example.expensetracker.viewmodel.UiEvent
 fun HomeScreen(
     expenseViewModel: ExpenseViewModel,
     categoryViewModel: CategoryViewModel,
-    budgetViewModel: BudgetViewModel,
+    settingViewModel: SettingViewModel,
     navController: NavHostController,
 ) {
     val expenses by expenseViewModel.getAllFilteredExpenses.collectAsState()
     val total by expenseViewModel.totalAmount.collectAsState()
     val categories by categoryViewModel.getAllCategories.collectAsState()
     val selectedFilters by expenseViewModel.selectedFilter.collectAsState()
-    val currencySymbol by budgetViewModel.currencySymbol.collectAsState()
-    val budgetState by budgetViewModel.budgetState.collectAsState()
+    val currencySymbol by settingViewModel.currencySymbol.collectAsState()
+    val budgetState by settingViewModel.budgetState.collectAsState()
+    val name by settingViewModel.username.collectAsState()
+    val imagePath by settingViewModel.imagePath.collectAsState()
+
     var showDialog by remember { mutableStateOf(false) }
     var showFilter by remember { mutableStateOf(false) }
     var showMessage by remember { mutableStateOf(false) }
@@ -47,7 +50,9 @@ fun HomeScreen(
         messageText = messageText,
         messageType = messageType,
         budgetState = budgetState,
-        currencySymbol = currencySymbol
+        currencySymbol = currencySymbol,
+        name = name,
+        imagePath = imagePath,
     )
 
     val homeUiActions = HomeUiActions(
@@ -61,6 +66,12 @@ fun HomeScreen(
         onDismissMessage = { showMessage = false },
         onNavigateToExpense = { id -> navController.navigate("expense/$id") },
         onShowDialog = { showDialog = true },
+        onSaveProfile = { name, path ->
+            settingViewModel.updateSettings(
+                username = name,
+                imagePath = path
+            )
+        }
     )
 
     LaunchedEffect(Unit) {

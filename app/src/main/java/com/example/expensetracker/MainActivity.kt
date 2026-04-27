@@ -4,7 +4,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Analytics
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,6 +28,7 @@ import com.example.expensetracker.room.database.DatabaseProvider
 import com.example.expensetracker.room.repository.CategoryRepository
 import com.example.expensetracker.room.repository.ExpenseRepository
 import com.example.expensetracker.room.repository.SettingsRepository
+import com.example.expensetracker.ui.components.MenuItem
 import com.example.expensetracker.ui.layouts.GeneralLayout
 import com.example.expensetracker.ui.layouts.ScreenLayout
 import com.example.expensetracker.ui.screens.home.HomeScreen
@@ -25,12 +37,14 @@ import com.example.expensetracker.ui.screens.search.SearchScreen
 import com.example.expensetracker.ui.screens.setting.SettingScreen
 import com.example.expensetracker.ui.screens.statistic.StatisticScreen
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
-import com.example.expensetracker.viewmodel.BudgetViewModel
+import com.example.expensetracker.viewmodel.SettingViewModel
 import com.example.expensetracker.viewmodel.BudgetViewModelFactory
 import com.example.expensetracker.viewmodel.CategoryViewModel
 import com.example.expensetracker.viewmodel.CategoryViewModelFactory
 import com.example.expensetracker.viewmodel.ExpenseViewModel
 import com.example.expensetracker.viewmodel.ExpenseViewModelFactory
+import com.example.expensetracker.viewmodel.StatisticViewModel
+import com.example.expensetracker.viewmodel.StatisticViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +74,13 @@ object Routes {
     )
 }
 
+val navItems = listOf(
+    MenuItem(Routes.HOME, "Home", Icons.Outlined.Home, Icons.Filled.Home),
+    MenuItem(Routes.SETTING, "Setting", Icons.Outlined.Settings, Icons.Filled.Settings),
+    MenuItem(Routes.STATISTIC, "Statistic", Icons.Outlined.Analytics, Icons.Filled.Analytics),
+    MenuItem(Routes.SEARCH, "Search", Icons.Outlined.Search, Icons.Filled.Search),
+)
+
 @Composable
 fun App() {
     val context = LocalContext.current
@@ -79,9 +100,15 @@ fun App() {
         factory = CategoryViewModelFactory(categoryRepo)
     )
 
-    val budgetViewModel: BudgetViewModel = viewModel(
+    val settingViewModel: SettingViewModel = viewModel(
         factory = BudgetViewModelFactory(expenseRepo, settingsRepo)
     )
+
+    val statisticViewModel: StatisticViewModel = viewModel(
+        factory = StatisticViewModelFactory(expenseRepo, categoryRepo, settingsRepo)
+    )
+
+    val currencySymbol by settingViewModel.currencySymbol.collectAsState()
 
     GeneralLayout(
         navController = navController,
@@ -96,7 +123,7 @@ fun App() {
                     HomeScreen(
                         expenseViewModel,
                         categoryViewModel,
-                        budgetViewModel,
+                        settingViewModel,
                         navController,
                     )
                 }
@@ -105,26 +132,26 @@ fun App() {
 
             composable(Routes.SETTING) {
                 ScreenLayout(paddingValues) {
-                    SettingScreen(categoryViewModel, budgetViewModel, expenseViewModel)
+                    SettingScreen(categoryViewModel, settingViewModel, expenseViewModel)
                 }
             }
 
             composable(Routes.EXPENSEDETAIL) { backStackEntry ->
                 val id = backStackEntry.arguments?.getString("id")?.toInt() ?: 0
                 ScreenLayout(paddingValues) {
-                    ExpenseDetailScreen(id, expenseViewModel, categoryViewModel)
+                    ExpenseDetailScreen(id, expenseViewModel, categoryViewModel, currencySymbol)
                 }
             }
 
             composable(Routes.SEARCH) {
                 ScreenLayout(paddingValues) {
-                    SearchScreen(expenseViewModel, categoryViewModel, navController)
+                    SearchScreen(expenseViewModel, categoryViewModel, navController, currencySymbol)
                 }
             }
 
             composable(Routes.STATISTIC) {
                 ScreenLayout(paddingValues) {
-                    StatisticScreen()
+                    StatisticScreen(statisticViewModel)
                 }
             }
 

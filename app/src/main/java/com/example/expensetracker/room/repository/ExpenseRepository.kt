@@ -21,8 +21,8 @@ class ExpenseRepository(private val dao: ExpenseDao) {
 
     fun getAllExpenses(categoryId: Int?) = dao.getAllExpenses(categoryId)
 
-    fun getExpenseFrom(from: Long, to: Long, categoryId: Int?) =
-        dao.getExpenseFrom(from, to, categoryId)
+    fun getExpenses(from: Long, to: Long, categoryId: Int?) =
+        dao.getExpenses(from, to, categoryId)
 
     fun searchExpense(query: String, from: Long, to: Long, categoryId: Int?) =
         dao.searchExpense(query, from, to, categoryId)
