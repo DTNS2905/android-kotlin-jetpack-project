@@ -21,5 +21,6 @@ data class Expense(
     val title: String,
     val amount: Double,
     val date: Long,
-    val categoryId: Int?
+    val categoryId: Int?,
+    val notes: String? = null
 )

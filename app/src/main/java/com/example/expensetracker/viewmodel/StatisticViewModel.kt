@@ -29,7 +29,8 @@ data class YearMonth(
 data class CategoryStat(
     val category: Category?,
     val amount: Double,
-    val percentage: Double
+    val percentage: Double,
+    val count: Int = 0
 )
 
 data class DailyStat(
@@ -89,11 +90,11 @@ class StatisticViewModel(
         val cal = Calendar.getInstance()
 
         val categoryStats = expenses.groupBy { it.categoryId  }
-            .map { (categoryId, expenses) ->
+            .map { (categoryId, group) ->
                 val category = categoryMap[categoryId]
-                val amount = expenses.sumOf { it.amount }
-                val percentage =  if (total > 0) (amount / total) else 0.0
-                CategoryStat(category, amount, percentage)
+                val amount = group.sumOf { it.amount }
+                val percentage = if (total > 0) (amount / total) else 0.0
+                CategoryStat(category, amount, percentage, count = group.size)
             }
             .sortedByDescending { it.amount }
 

@@ -23,6 +23,10 @@ fun SettingScreen(
     val categories by categoryViewModel.getAllCategories.collectAsState()
     val budgetState by settingViewModel.budgetState.collectAsState()
     val currencySymbol by settingViewModel.currencySymbol.collectAsState()
+    val username by settingViewModel.username.collectAsState()
+    val imagePath by settingViewModel.imagePath.collectAsState()
+    val darkMode by settingViewModel.darkMode.collectAsState()
+    val dailyReminders by settingViewModel.dailyReminders.collectAsState()
     var activeDialog by remember { mutableStateOf<SettingDialog?>(null) }
 
     SettingContent(
@@ -30,7 +34,11 @@ fun SettingScreen(
             categories = categories,
             budgetState = budgetState,
             activeDialog = activeDialog,
-            currencySymbol = currencySymbol
+            currencySymbol = currencySymbol,
+            username = username,
+            imagePath = imagePath,
+            darkMode = darkMode,
+            dailyReminders = dailyReminders
         ),
         actions = SettingUiActions(
             onShowDialog = { activeDialog = it },
@@ -55,7 +63,13 @@ fun SettingScreen(
             onConfirmCurrency = {
                 settingViewModel.updateSettings(currencySymbol = it)
                 activeDialog = null
-            }
+            },
+            onSaveProfile = { name, path ->
+                settingViewModel.updateSettings(username = name, imagePath = path)
+                activeDialog = null
+            },
+            onDarkModeChange = { settingViewModel.updateSettings(darkMode = it) },
+            onDailyRemindersChange = { settingViewModel.updateSettings(dailyReminders = it) }
         )
     )
 }

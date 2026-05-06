@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import com.example.expensetracker.Routes
 import com.example.expensetracker.ui.components.MenuBar
-import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,8 +60,6 @@ fun GeneralLayout(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        ExpenseTrackerTheme {
-            content(paddingValues)
-        }
+        content(paddingValues)
     }
 }

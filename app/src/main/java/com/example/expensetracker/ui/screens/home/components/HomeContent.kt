@@ -63,7 +63,8 @@ data class  HomeUiActions(
     val onFilterUpdate: (Filters) -> Unit,
     val onDismissMessage: () -> Unit,
     val onNavigateToExpense: (Int) -> Unit,
-    val onSaveProfile: (String, String?) -> Unit
+    val onSaveProfile: (String, String?) -> Unit,
+    val onNavigateToSettings: () -> Unit = {}
 )
 
 @Composable
@@ -73,11 +74,7 @@ fun HomeContent(
 ) {
     var showEditProfile by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -103,7 +100,11 @@ fun HomeContent(
 
             TotalCard(homeUiState.total, homeUiState.currencySymbol)
 
-            BudgetCard(homeUiState.budgetState, homeUiState.currencySymbol)
+            BudgetCard(
+                budgetState = homeUiState.budgetState,
+                currencySymbol = homeUiState.currencySymbol,
+                onSetBudget = homeUiActions.onNavigateToSettings
+            )
 
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(

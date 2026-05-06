@@ -13,4 +13,6 @@ data class Settings(
     val currencySymbol: String = "$",
     val name: String = "User",
     val imagePath: String? = null,
+    val darkMode: Boolean = false,
+    val dailyReminders: Boolean = false,
 )

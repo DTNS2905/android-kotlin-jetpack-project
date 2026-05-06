@@ -57,6 +57,7 @@ fun MenuBar(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 6.dp,
         shadowElevation = 16.dp,
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     ) {

@@ -95,7 +95,6 @@ fun StatisticContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -115,7 +114,8 @@ fun StatisticContent(
                 DonutChartCard(
                     categoryStats = state.categoryStats,
                     totalSpent = state.totalSpent,
-                    currencySymbol = state.currencySymbol
+                    currencySymbol = state.currencySymbol,
+                    selectedMonth = selectedMonth
                 )
             }
 
@@ -274,7 +274,8 @@ private fun MonthPickerDialog(
 private fun DonutChartCard(
     categoryStats: List<CategoryStat>,
     totalSpent: Double,
-    currencySymbol: String
+    currencySymbol: String,
+    selectedMonth: YearMonth
 ) {
     val segmentColors = categoryStats.map { stat ->
         stat.category?.let { Color(it.color.toInt()) } ?: MaterialTheme.colorScheme.outlineVariant
@@ -291,7 +292,7 @@ private fun DonutChartCard(
         ) {
             Column {
                 Text("By category", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Text("This month", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(selectedMonth.label(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
 
             Row(
@@ -464,9 +465,14 @@ private fun TopCategoryCard(top: CategoryStat, currencySymbol: String) {
                 Column {
                     Text("TOP CATEGORY", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text(
-                        "${top.category?.title ?: "Uncategorized"} — ${formatDollar(top.amount, currencySymbol)}",
+                        top.category?.title ?: "Uncategorized",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        "${formatDollar(top.amount, currencySymbol)} · ${top.count} transaction${if (top.count == 1) "" else "s"}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

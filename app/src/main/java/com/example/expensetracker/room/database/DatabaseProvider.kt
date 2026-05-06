@@ -14,7 +14,8 @@ object DatabaseProvider {
                         "expense_db"
                     )
                     .addMigrations(AppDatabase.MIGRATION_3_4)
-                .addMigrations(AppDatabase.MIGRATION_4_5)
+                    .addMigrations(AppDatabase.MIGRATION_4_5)
+                    .addMigrations(AppDatabase.MIGRATION_5_6)
                     .fallbackToDestructiveMigration(false).build()
             INSTANCE = instance
             instance

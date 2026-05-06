@@ -71,7 +71,8 @@ fun HomeScreen(
                 username = name,
                 imagePath = path
             )
-        }
+        },
+        onNavigateToSettings = { navController.navigate("setting") }
     )
 
     LaunchedEffect(Unit) {

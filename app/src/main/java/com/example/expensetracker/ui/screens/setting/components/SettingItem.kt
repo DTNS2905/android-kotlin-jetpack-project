@@ -12,6 +12,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,13 +29,19 @@ fun SettingItem(
     subtitle: String? = null,
     tint: Color = Color.Unspecified,
     showArrow: Boolean = true,
+    checked: Boolean? = null,
+    onCheckedChange: ((Boolean) -> Unit)? = null,
     onClick: () -> Unit = {}
 ) {
     val contentColor = if (tint != Color.Unspecified) tint
                        else MaterialTheme.colorScheme.onSurface
 
+    val action: () -> Unit = checked?.let { isChecked ->
+        { onCheckedChange?.invoke(!isChecked) }
+    } ?: onClick
+
     Card(
-        onClick = onClick,
+        onClick =  action,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -61,21 +68,25 @@ fun SettingItem(
                 modifier = Modifier.weight(1f)
             )
 
-            subtitle?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            if (checked != null) {
+                Switch(checked = checked, onCheckedChange = onCheckedChange)
+            } else {
+                subtitle?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
 
-            if (showArrow) {
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(18.dp)
-                )
+                if (showArrow) {
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
     }

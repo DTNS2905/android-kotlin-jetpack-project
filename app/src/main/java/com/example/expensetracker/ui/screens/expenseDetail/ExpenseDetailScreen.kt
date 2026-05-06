@@ -33,12 +33,14 @@ fun ExpenseDetailScreen(
     expenseId: Int,
     expenseViewModel: ExpenseViewModel,
     categoryViewModel: CategoryViewModel,
+    onBack: () -> Unit = {},
     currencySymbol: String = "$"
 ) {
     val state by expenseViewModel.expenseDetailState.collectAsState()
     val categories by categoryViewModel.getAllCategories.collectAsState()
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
     var titleError = validate(title, titleRules)
     var amountError = validate(amount, amountRules)
     var isEditing by remember { mutableStateOf(false) }
@@ -53,6 +55,7 @@ fun ExpenseDetailScreen(
             val expense = (state as ExpenseDetailState.Success).expense
             title = expense.title
             amount = expense.amount.toString()
+            notes = expense.notes ?: ""
         }
     }
 
@@ -77,11 +80,13 @@ fun ExpenseDetailScreen(
                 isEditing = isEditing,
                 title = title,
                 amount = amount,
+                notes = notes,
                 titleError = titleError,
                 amountError = amountError,
                 showAssignDialog = showAssignDialog,
                 onTitleChange = { title = it; titleError = null },
                 onAmountChange = { amount = it; amountError = null },
+                onNotesChange = { notes = it },
                 onEditToggle = { isEditing = true },
                 onCancelEdit = { isEditing = false },
                 onSaveEdit = {
@@ -90,7 +95,7 @@ fun ExpenseDetailScreen(
                         ValidationField(amount, amountRules) { amountError = it }
                     ))
                     if (isValid) {
-                        expenseViewModel.updateExpense(expense.copy(title = title, amount = amount.toDouble()))
+                        expenseViewModel.updateExpense(expense.copy(title = title, amount = amount.toDouble(), notes = notes.ifBlank { null }))
                         isEditing = false
                     }
                 },
@@ -104,6 +109,7 @@ fun ExpenseDetailScreen(
                     showAssignDialog = false
                 },
                 onDelete = { expenseViewModel.deleteExpense(expense) },
+                onBack = onBack,
                 currencySymbol = currencySymbol
             )
         }
@@ -128,13 +134,14 @@ private fun ExpenseDetailContentPreview() {
             isEditing = false,
             title = fakeExpense.title,
             amount = fakeExpense.amount.toString(),
+            notes = "",
             titleError = null,
             amountError = null,
             showAssignDialog = false,
-            onTitleChange = {}, onAmountChange = {}, onEditToggle = {},
+            onTitleChange = {}, onAmountChange = {}, onNotesChange = {}, onEditToggle = {},
             onCancelEdit = {}, onSaveEdit = {}, onRemoveCategory = {},
             onShowAssignDialog = {}, onDismissAssignDialog = {}, onConfirmAssign = {},
-            onDelete = {}
+            onDelete = {}, onBack = {}
         )
     }
 }

@@ -13,7 +13,7 @@ import com.example.expensetracker.room.model.Settings
 
 @Database(
     entities = [Expense::class, Category::class, Settings::class],
-    version = 5
+    version = 6
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun expenseDao(): ExpenseDao
@@ -32,6 +32,14 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE settings ADD COLUMN name TEXT NOT NULL DEFAULT 'User'")
                 db.execSQL("ALTER TABLE settings ADD COLUMN imagePath TEXT")
+            }
+        }
+
+        val MIGRATION_5_6: Migration = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE expenses ADD COLUMN notes TEXT")
+                db.execSQL("ALTER TABLE settings ADD COLUMN darkMode INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE settings ADD COLUMN dailyReminders INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

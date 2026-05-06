@@ -73,12 +73,22 @@ class SettingViewModel (
             null
         )
 
+    val darkMode: StateFlow<Boolean> = settingsRepository.settings
+        .map { it.darkMode }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val dailyReminders: StateFlow<Boolean> = settingsRepository.settings
+        .map { it.dailyReminders }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     fun updateSettings(
         budget: Double = budgetState.value.budget,
         alertThreshold: Int = budgetState.value.alertThreshold,
         currencySymbol: String = this.currencySymbol.value,
         username: String = this.username.value,
-        imagePath: String? = this.imagePath.value
+        imagePath: String? = this.imagePath.value,
+        darkMode: Boolean = this.darkMode.value,
+        dailyReminders: Boolean = this.dailyReminders.value
     ) {
         viewModelScope.launch {
             settingsRepository.upsertSettings(
@@ -87,7 +97,9 @@ class SettingViewModel (
                     budgetAlert = alertThreshold,
                     currencySymbol = currencySymbol,
                     name = username,
-                    imagePath = imagePath
+                    imagePath = imagePath,
+                    darkMode = darkMode,
+                    dailyReminders = dailyReminders
                 )
             )
         }
