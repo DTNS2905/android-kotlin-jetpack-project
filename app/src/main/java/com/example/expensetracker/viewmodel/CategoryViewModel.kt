@@ -21,9 +21,9 @@ class CategoryViewModel(
             emptyList()
         )
 
-    fun addCategory(title: String, color: Long) {
+    fun addCategory(title: String, color: Long, icon: String = "receipt") {
         viewModelScope.launch {
-            repository.insert(Category(title = title, color = color))
+            repository.insert(Category(title = title, color = color, icon = icon))
         }
     }
 

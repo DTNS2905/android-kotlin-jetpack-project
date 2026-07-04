@@ -54,6 +54,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.expensetracker.room.model.Category
 import com.example.expensetracker.ui.theme.ExpenseTrackerTheme
+import com.example.expensetracker.utils.iconVectorFor
 import com.example.expensetracker.utils.formatDollar
 import com.example.expensetracker.utils.label
 import com.example.expensetracker.viewmodel.CategoryStat
@@ -455,11 +456,11 @@ private fun TopCategoryCard(top: CategoryStat, currencySymbol: String) {
                     modifier = Modifier.size(44.dp).clip(CircleShape).background(color),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        top.category?.title?.take(1)?.uppercase() ?: "?",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                    Icon(
+                        imageVector = iconVectorFor(top.category?.icon ?: "receipt"),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(22.dp)
                     )
                 }
                 Column {

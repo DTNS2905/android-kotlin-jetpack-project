@@ -30,6 +30,7 @@ import com.example.expensetracker.utils.validateAllFields
 fun AddExpenseDialog(
     showDialog: (Boolean) -> Unit,
     categories: List<Category> = emptyList(),
+    currencySymbol: String,
     onAdd: (String, Double, Int?) -> Unit = { _, _, _ -> }
 ) {
     var title by remember { mutableStateOf("") }
@@ -73,7 +74,7 @@ fun AddExpenseDialog(
                 onValueChange = { amount = it; amountError = null },
                 label = "Amount",
                 error = amountError,
-                prefix = "$",
+                prefix = currencySymbol,
                 keyboardType = KeyboardType.Decimal,
                 modifier = Modifier.fillMaxWidth()
             )

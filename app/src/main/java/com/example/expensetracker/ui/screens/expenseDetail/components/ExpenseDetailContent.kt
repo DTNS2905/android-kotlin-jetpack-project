@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.rounded.Receipt
+import com.example.expensetracker.utils.iconVectorFor
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -114,7 +115,7 @@ fun ExpenseDetailContent(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.Receipt,
+                        imageVector = iconVectorFor(assignedCategory?.icon ?: "receipt"),
                         contentDescription = null,
                         tint = categoryColor,
                         modifier = Modifier.size(32.dp)

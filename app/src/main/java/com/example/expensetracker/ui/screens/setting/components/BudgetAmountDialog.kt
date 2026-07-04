@@ -27,7 +27,7 @@ fun BudgetAmountDialog(
 
     CustomDialog(
         title = "Set Monthly Budget",
-        onDismiss = { onDismiss },
+        onDismiss = onDismiss,
         onConfirm = { input.toDoubleOrNull()?.let { onConfirm(it) }},
         confirmEnabled = error == null && input.isNotEmpty()
     ) {

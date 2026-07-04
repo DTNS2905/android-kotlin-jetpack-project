@@ -115,10 +115,11 @@ fun HomeContent(
                     Text(text = "RECENT EXPENSES", style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        val filterCount =
+                            (if (homeUiState.selectedFilters.time != TimeFilter.ALL) 1 else 0) +
+                            (if (homeUiState.selectedFilters.categoryId != null) 1 else 0)
                         BadgedBox(badge = {
-                            if (homeUiState.selectedFilters.time != TimeFilter.ALL ||
-                                homeUiState.selectedFilters.categoryId != null
-                                ) Badge()
+                            if (filterCount > 0) Badge { Text("$filterCount") }
                         }) {
                             IconButton(onClick = homeUiActions.onShowFilter) {
                                 Icon(Icons.Default.FilterList, contentDescription = "Filter")
@@ -161,6 +162,7 @@ fun HomeContent(
     if (homeUiState.showDialog) {
         AddExpenseDialog(
             categories = homeUiState.categories,
+            currencySymbol = homeUiState.currencySymbol,
             showDialog = { homeUiActions.onDismissDialog() },
             onAdd = homeUiActions.onAddExpense
         )

@@ -14,11 +14,22 @@ import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -31,6 +42,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.expensetracker.room.database.DatabaseProvider
 import com.example.expensetracker.room.repository.CategoryRepository
 import com.example.expensetracker.room.repository.ExpenseRepository
+import com.example.expensetracker.room.repository.ExpenseTemplateRepository
+import com.example.expensetracker.room.repository.MonthlyBudgetRepository
 import com.example.expensetracker.room.repository.SettingsRepository
 import com.example.expensetracker.ui.components.MenuItem
 import com.example.expensetracker.ui.layouts.GeneralLayout
@@ -47,6 +60,8 @@ import com.example.expensetracker.viewmodel.CategoryViewModel
 import com.example.expensetracker.viewmodel.CategoryViewModelFactory
 import com.example.expensetracker.viewmodel.ExpenseViewModel
 import com.example.expensetracker.viewmodel.ExpenseViewModelFactory
+import com.example.expensetracker.viewmodel.ExpenseTemplateViewModel
+import com.example.expensetracker.viewmodel.ExpenseTemplateViewModelFactory
 import com.example.expensetracker.viewmodel.StatisticViewModel
 import com.example.expensetracker.viewmodel.StatisticViewModelFactory
 
@@ -86,8 +101,10 @@ fun App() {
     val context = LocalContext.current
     val db = remember { DatabaseProvider.getDatabase(context) }
     val expenseRepo = remember { ExpenseRepository(db.expenseDao()) }
+    val expenseTemplateRepo = remember { ExpenseTemplateRepository(db.expenseTemplateDao()) }
     val categoryRepo = remember { CategoryRepository(db.categoryDao()) }
     val settingsRepo = remember { SettingsRepository(db.settingDao()) }
+    val monthlyBudgetRepo = remember { MonthlyBudgetRepository(db.monthlyBudgetDao()) }
     val navController = rememberNavController()
     val currentRoute =
         navController.currentBackStackEntryAsState().value?.destination?.route
@@ -96,20 +113,55 @@ fun App() {
         factory = ExpenseViewModelFactory(expenseRepo)
     )
 
+    val expenseTemplateViewModel: ExpenseTemplateViewModel = viewModel(
+        factory = ExpenseTemplateViewModelFactory(expenseTemplateRepo, expenseRepo)
+    )
+
     val categoryViewModel: CategoryViewModel = viewModel(
         factory = CategoryViewModelFactory(categoryRepo)
     )
 
     val settingViewModel: SettingViewModel = viewModel(
-        factory = BudgetViewModelFactory(expenseRepo, settingsRepo)
+        factory = BudgetViewModelFactory(
+            expenseRepo,
+            settingsRepo,
+            monthlyBudgetRepo
+        )
     )
 
     val statisticViewModel: StatisticViewModel = viewModel(
-        factory = StatisticViewModelFactory(expenseRepo, categoryRepo, settingsRepo)
+        factory = StatisticViewModelFactory(
+            expenseRepo,
+            categoryRepo,
+            settingsRepo
+        )
     )
 
     val currencySymbol by settingViewModel.currencySymbol.collectAsState()
     val darkMode by settingViewModel.darkMode.collectAsState()
+    val isLoaded by settingViewModel.isLoaded.collectAsState()
+    var minDelayPassed by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(1000)
+        minDelayPassed = true
+    }
+
+    LaunchedEffect(Unit) {
+        expenseTemplateViewModel.addDueTemplateExpenses()
+    }
+
+    if (!isLoaded || !minDelayPassed) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFEFF5F0)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = Color(0xFF4CAF50))
+        }
+        return
+    }
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -144,7 +196,12 @@ fun App() {
 
             composable(Routes.SETTING) {
                 ScreenLayout(paddingValues) {
-                    SettingScreen(categoryViewModel, settingViewModel, expenseViewModel)
+                    SettingScreen(
+                        categoryViewModel,
+                        settingViewModel,
+                        expenseViewModel,
+                        expenseTemplateViewModel
+                    )
                 }
             }
 

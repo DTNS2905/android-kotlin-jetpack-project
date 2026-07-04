@@ -27,7 +27,7 @@ fun BudgetAlertDialog(
 
     CustomDialog(
         title = "Budget Alert",
-        onDismiss = { onDismiss },
+        onDismiss = onDismiss,
         onConfirm = { input.toIntOrNull()?.let { onConfirm(it) }},
         confirmEnabled = error == null && input.isNotEmpty()
     ) {
