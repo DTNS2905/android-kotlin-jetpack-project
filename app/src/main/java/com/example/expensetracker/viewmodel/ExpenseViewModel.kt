@@ -58,11 +58,15 @@ class ExpenseViewModel(
 
     private val _searchQuery = MutableStateFlow("")
 
+    private val _searchCategoryId = MutableStateFlow<Int?>(null)
+
     val uiEvent = _uiEvent.asSharedFlow()
 
     val selectedFilter = _selectedFilters.asStateFlow()
 
     val searchQuery = _searchQuery.asStateFlow()
+
+    val searchCategoryId = _searchCategoryId.asStateFlow()
 
     fun loadExpense(id: Int) {
         _selectedId.value = id
@@ -74,6 +78,14 @@ class ExpenseViewModel(
 
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
+    }
+
+    fun toggleSearchCategory(categoryId: Int) {
+        _searchCategoryId.update { if (it == categoryId) null else categoryId }
+    }
+
+    fun clearSearchCategory() {
+        _searchCategoryId.value = null
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -121,14 +133,13 @@ class ExpenseViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val searchResults: StateFlow<List<Expense>> =
-        combine(_searchQuery, _selectedFilters)
-        {query, filters -> query to filters}
-        .flatMapLatest { (query, filters) ->
-            if (query.isBlank()) {
+        combine(_searchQuery, _searchCategoryId) { query, categoryId -> query to categoryId }
+        .flatMapLatest { (query, categoryId) ->
+            if (query.isBlank() && categoryId == null) {
                 flowOf(emptyList())
             } else {
-                val (from, to) = filters.time.toTimeRange()
-                repository.searchExpense(query, from, to, filters.categoryId)
+                val (from, to) = TimeFilter.ALL.toTimeRange()
+                repository.searchExpense(query.trim(), from, to, categoryId)
             }
         }.stateIn(
             viewModelScope,

@@ -21,6 +21,7 @@ fun SearchScreen(
     val query by expenseViewModel.searchQuery.collectAsState()
     val results by expenseViewModel.searchResults.collectAsState()
     val categories by categoryViewModel.getAllCategories.collectAsState()
+    val selectedCategoryId by expenseViewModel.searchCategoryId.collectAsState()
 
     var recentSearches by remember { mutableStateOf(listOf<String>()) }
 
@@ -33,6 +34,7 @@ fun SearchScreen(
         query = query,
         results = results,
         categories = categories,
+        selectedCategoryId = selectedCategoryId,
         currencySymbol = currencySymbol,
         recentSearches = recentSearches,
         onQueryChange = {
@@ -44,6 +46,7 @@ fun SearchScreen(
             expenseViewModel.setSearchQuery("")
         },
         onRecentSearchClick = { expenseViewModel.setSearchQuery(it) },
+        onCategoryClick = { expenseViewModel.toggleSearchCategory(it) },
         onNavigateToExpense = { id -> navController.navigate("expense/$id") }
     )
 }

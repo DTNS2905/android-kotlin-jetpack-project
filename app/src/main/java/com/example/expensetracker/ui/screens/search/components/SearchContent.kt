@@ -46,13 +46,18 @@ fun SearchContent(
     query: String,
     results: List<Expense>,
     categories: List<Category>,
+    selectedCategoryId: Int? = null,
     currencySymbol: String = "$",
     recentSearches: List<String> = emptyList(),
     onQueryChange: (String) -> Unit,
     onClearQuery: () -> Unit,
     onRecentSearchClick: (String) -> Unit = {},
+    onCategoryClick: (Int) -> Unit = {},
     onNavigateToExpense: (Int) -> Unit
 ) {
+    val hasActiveFilter = query.isNotBlank() || selectedCategoryId != null
+    val selectedCategory = categories.firstOrNull { it.id == selectedCategoryId }
+
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -77,8 +82,54 @@ fun SearchContent(
             shape = RoundedCornerShape(16.dp)
         )
 
+        if (categories.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    "FILTER BY CATEGORY",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    categories.forEach { category ->
+                        val catColor = Color(category.color.toInt())
+                        val isSelected = category.id == selectedCategoryId
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { onCategoryClick(category.id) },
+                            label = { Text(category.title) },
+                            leadingIcon = {
+                                Box(
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .clip(CircleShape)
+                                        .background(catColor),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = category.title.take(1).uppercase(),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = catColor.copy(alpha = 0.08f),
+                                labelColor = MaterialTheme.colorScheme.onSurface,
+                                selectedContainerColor = catColor.copy(alpha = 0.24f),
+                                selectedLabelColor = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
         when {
-            query.isBlank() -> {
+            !hasActiveFilter -> {
                 if (recentSearches.isNotEmpty()) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
@@ -98,52 +149,7 @@ fun SearchContent(
                             }
                         }
                     }
-                }
-
-                if (categories.isNotEmpty()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(
-                            "FILTER BY CATEGORY",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            categories.forEach { category ->
-                                val catColor = Color(category.color.toInt())
-                                FilterChip(
-                                    selected = false,
-                                    onClick = { onRecentSearchClick(category.title) },
-                                    label = { Text(category.title) },
-                                    leadingIcon = {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(20.dp)
-                                                .clip(CircleShape)
-                                                .background(catColor),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Text(
-                                                text = category.title.take(1).uppercase(),
-                                                style = MaterialTheme.typography.labelSmall,
-                                                fontWeight = FontWeight.Bold,
-                                                color = Color.White
-                                            )
-                                        }
-                                    },
-                                    colors = FilterChipDefaults.filterChipColors(
-                                        containerColor = catColor.copy(alpha = 0.08f),
-                                        labelColor = MaterialTheme.colorScheme.onSurface
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-
-                if (recentSearches.isEmpty() && categories.isEmpty()) {
+                } else if (categories.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
                             "Type to search expenses",
@@ -155,9 +161,18 @@ fun SearchContent(
             }
 
             results.isEmpty() -> {
+                val emptyText = when {
+                    query.isNotBlank() && selectedCategory != null ->
+                        "No expenses found for \"$query\" in ${selectedCategory.title}"
+                    query.isNotBlank() ->
+                        "No expenses found for \"$query\""
+                    selectedCategory != null ->
+                        "No expenses in ${selectedCategory.title}"
+                    else -> "No expenses found"
+                }
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        "No expenses found for \"$query\"",
+                        emptyText,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
