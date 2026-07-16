@@ -13,11 +13,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +34,9 @@ import com.example.expensetracker.ui.components.AppButton
 import com.example.expensetracker.ui.components.AppTextField
 import com.example.expensetracker.ui.components.CustomDialog
 import com.example.expensetracker.utils.ImageUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun EditProfileDialog(
@@ -42,18 +47,34 @@ fun EditProfileDialog(
 ) {
 
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var name by remember { mutableStateOf(currentName) }
     var imagePath by remember { mutableStateOf(currentImagePath) }
+    var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+    var isProcessingImage by remember { mutableStateOf(false) }
 
-    val bitmap by produceState<ImageBitmap?>(null, imagePath) {
-        value = ImageUtils.loadBitmap(imagePath)
+    // Initial load of the existing profile image.
+    LaunchedEffect(Unit) {
+        bitmap = ImageUtils.loadBitmap(currentImagePath)
     }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
-            imagePath = ImageUtils.copyToInternalStorage(context, uri)
+            scope.launch {
+                isProcessingImage = true
+                // Copy off the main thread, then decode, so the UI stays responsive
+                // and Save stays disabled until the new image is ready to display.
+                val path = withContext(Dispatchers.IO) {
+                    ImageUtils.copyToInternalStorage(context, uri)
+                }
+                if (path != null) {
+                    imagePath = path
+                    bitmap = ImageUtils.loadBitmap(path)
+                }
+                isProcessingImage = false
+            }
         }
     }
 
@@ -61,6 +82,7 @@ fun EditProfileDialog(
         title = "Edit Profile",
         onDismiss = onDismiss,
         onConfirm = { onConfirm(name, imagePath) },
+        confirmEnabled = !isProcessingImage,
         icon = Icons.Default.Person,
         confirmText = "Save"
     ) {
@@ -70,24 +92,29 @@ fun EditProfileDialog(
 
         ) {
             Box(
-                contentAlignment = Alignment.BottomEnd
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(80.dp)
             ) {
-                if(bitmap != null) {
-                    Image(
-                        bitmap = bitmap!!,
-                        contentDescription = "Profile",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(80.dp).clip(CircleShape)
-                    )
-                }
-
-                else {
-                    Image(
-                        contentScale = ContentScale.Crop,
-                        contentDescription = "Profile",
-                        painter = painterResource(R.drawable.sang),
-                        modifier = Modifier.size(80.dp).clip(CircleShape)
-                    )
+                when {
+                    isProcessingImage -> {
+                        CircularProgressIndicator(modifier = Modifier.size(40.dp))
+                    }
+                    bitmap != null -> {
+                        Image(
+                            bitmap = bitmap!!,
+                            contentDescription = "Profile",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.size(80.dp).clip(CircleShape)
+                        )
+                    }
+                    else -> {
+                        Image(
+                            contentScale = ContentScale.Crop,
+                            contentDescription = "Profile",
+                            painter = painterResource(R.drawable.sang),
+                            modifier = Modifier.size(80.dp).clip(CircleShape)
+                        )
+                    }
                 }
             }
             AppButton(
@@ -96,6 +123,7 @@ fun EditProfileDialog(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                     )
                 },
+                enabled = !isProcessingImage,
                 icon = Icons.Default.PhotoCamera
             )
 

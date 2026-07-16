@@ -4,13 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.expensetracker.constants.TimeFilter
 import com.example.expensetracker.room.model.MonthlyBudget
 import com.example.expensetracker.room.model.Settings
 import com.example.expensetracker.room.repository.ExpenseRepository
 import com.example.expensetracker.room.repository.MonthlyBudgetRepository
 import com.example.expensetracker.room.repository.SettingsRepository
-import com.example.expensetracker.utils.toTimeRange
+import com.example.expensetracker.utils.toRange
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -54,10 +53,12 @@ class SettingViewModel (
         }
     }
 
+    private val currentMonthRange = YearMonth(currentYear, currentMonth).toRange()
+
     val budgetState: StateFlow<BudgetState> = combine(
         expenseRepository.getTotalAmountForPeriod(
-            from = TimeFilter.THIS_MONTH.toTimeRange().first,
-            to = TimeFilter.THIS_MONTH.toTimeRange().second
+            from = currentMonthRange.first,
+            to = currentMonthRange.second
         ),
         settingsRepository.settings,
         monthlyBudgetRepository.getBudgetForMonth(

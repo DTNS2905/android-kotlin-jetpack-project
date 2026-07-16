@@ -213,6 +213,12 @@ fun App() {
                         expenseViewModel = expenseViewModel,
                         categoryViewModel = categoryViewModel,
                         onBack = { navController.popBackStack() },
+                        onDeleted = {
+                            navController.navigate(Routes.HOME) {
+                                popUpTo(Routes.HOME) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        },
                         currencySymbol = currencySymbol
                     )
                 }

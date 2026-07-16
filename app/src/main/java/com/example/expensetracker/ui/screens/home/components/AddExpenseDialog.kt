@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AddCircle
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ fun AddExpenseDialog(
     showDialog: (Boolean) -> Unit,
     categories: List<Category> = emptyList(),
     currencySymbol: String,
+    isLoading: Boolean = false,
     onAdd: (String, Double, Int?) -> Unit = { _, _, _ -> }
 ) {
     var title by remember { mutableStateOf("") }
@@ -38,13 +40,25 @@ fun AddExpenseDialog(
     var selectedCategoryId by remember { mutableStateOf<Int?>(null) }
     var titleError by remember { mutableStateOf<String?>(null) }
     var amountError by remember { mutableStateOf<String?>(null) }
+    var awaitingClose by remember { mutableStateOf(false) }
+
+    // Close the dialog once the insert we submitted has finished (loading true -> false).
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            awaitingClose = true
+        } else if (awaitingClose) {
+            showDialog(false)
+        }
+    }
 
     CustomDialog(
         title = "Add Expense",
         icon = Icons.Rounded.AddCircle,
         confirmText = "Add",
-        onDismiss = { showDialog(false) },
+        confirmLoading = isLoading,
+        onDismiss = { if (!isLoading) showDialog(false) },
         onConfirm = {
+            if (isLoading) return@CustomDialog
             val isValid = validateAllFields(
                 listOf(
                     ValidationField(title, titleRules) { titleError = it },
@@ -53,7 +67,6 @@ fun AddExpenseDialog(
             )
             if (isValid) {
                 onAdd(title, amount.toDouble(), selectedCategoryId)
-                showDialog(false)
             }
         },
         properties = DialogProperties(

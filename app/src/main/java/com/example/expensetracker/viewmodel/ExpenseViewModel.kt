@@ -60,6 +60,10 @@ class ExpenseViewModel(
 
     private val _searchCategoryId = MutableStateFlow<Int?>(null)
 
+    private val _isAddingExpense = MutableStateFlow(false)
+
+    val isAddingExpense = _isAddingExpense.asStateFlow()
+
     val uiEvent = _uiEvent.asSharedFlow()
 
     val selectedFilter = _selectedFilters.asStateFlow()
@@ -148,22 +152,27 @@ class ExpenseViewModel(
         )
 
     fun addExpense(title: String, amount: Double, categoryId: Int?) {
+        _isAddingExpense.value = true
         viewModelScope.launch {
-            repository.insert(
-                Expense(
-                    title = title,
-                    amount = amount,
-                    date = System.currentTimeMillis(),
-                    categoryId = categoryId
+            try {
+                repository.insert(
+                    Expense(
+                        title = title,
+                        amount = amount,
+                        date = System.currentTimeMillis(),
+                        categoryId = categoryId
+                    )
                 )
-            )
-            _uiEvent.emit(
-                UiEvent
-                    .ShowMessage(
-                        "Expense added successfully",
-                        MessageType.SUCCESS
+                _uiEvent.emit(
+                    UiEvent
+                        .ShowMessage(
+                            "Expense added successfully",
+                            MessageType.SUCCESS
+                    )
                 )
-            )
+            } finally {
+                _isAddingExpense.value = false
+            }
         }
     }
 

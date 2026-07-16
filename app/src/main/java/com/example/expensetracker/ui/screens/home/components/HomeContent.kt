@@ -44,6 +44,7 @@ data class HomeUiState(
     val categories: List<Category>,
     val selectedFilters: Filters,
     val showDialog: Boolean,
+    val isAddingExpense: Boolean,
     val showFilter: Boolean,
     val showMessage: Boolean,
     val messageText: String,
@@ -163,6 +164,7 @@ fun HomeContent(
         AddExpenseDialog(
             categories = homeUiState.categories,
             currencySymbol = homeUiState.currencySymbol,
+            isLoading = homeUiState.isAddingExpense,
             showDialog = { homeUiActions.onDismissDialog() },
             onAdd = homeUiActions.onAddExpense
         )
@@ -195,6 +197,7 @@ private fun HomeContentPreview() {
                 ),
                 selectedFilters = Filters(TimeFilter.ALL),
                 showDialog = false,
+                isAddingExpense = false,
                 showFilter = false,
                 showMessage = false,
                 messageText = "",

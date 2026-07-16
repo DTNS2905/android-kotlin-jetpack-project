@@ -34,6 +34,7 @@ fun ExpenseDetailScreen(
     expenseViewModel: ExpenseViewModel,
     categoryViewModel: CategoryViewModel,
     onBack: () -> Unit = {},
+    onDeleted: () -> Unit = onBack,
     currencySymbol: String = "$"
 ) {
     val state by expenseViewModel.expenseDetailState.collectAsState()
@@ -108,7 +109,10 @@ fun ExpenseDetailScreen(
                     expenseViewModel.updateExpense(expense.copy(categoryId = categoryId))
                     showAssignDialog = false
                 },
-                onDelete = { expenseViewModel.deleteExpense(expense) },
+                onDelete = {
+                    expenseViewModel.deleteExpense(expense)
+                    onDeleted()
+                },
                 onBack = onBack,
                 currencySymbol = currencySymbol
             )

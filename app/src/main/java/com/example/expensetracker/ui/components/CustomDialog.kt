@@ -28,6 +28,7 @@ fun CustomDialog(
     confirmText: String = "Save",
     dismissText: String = "Cancel",
     confirmEnabled: Boolean = true,
+    confirmLoading: Boolean = false,
     icon: ImageVector? = null,
     properties: DialogProperties = DialogProperties(),
     content: @Composable () -> Unit
@@ -77,6 +78,7 @@ fun CustomDialog(
                     AppButton(
                         onClick = onConfirm,
                         enabled = confirmEnabled,
+                        loading = confirmLoading,
                         text = confirmText,
                         variant = ButtonVariant.PRIMARY,
                         modifier = Modifier.weight(1f)

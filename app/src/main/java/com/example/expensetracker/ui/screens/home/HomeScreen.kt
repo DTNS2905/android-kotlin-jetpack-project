@@ -32,6 +32,7 @@ fun HomeScreen(
     val budgetState by settingViewModel.budgetState.collectAsState()
     val name by settingViewModel.username.collectAsState()
     val imagePath by settingViewModel.imagePath.collectAsState()
+    val isAddingExpense by expenseViewModel.isAddingExpense.collectAsState()
 
     var showDialog by remember { mutableStateOf(false) }
     var showFilter by remember { mutableStateOf(false) }
@@ -45,6 +46,7 @@ fun HomeScreen(
         categories = categories,
         selectedFilters = selectedFilters,
         showDialog = showDialog,
+        isAddingExpense = isAddingExpense,
         showFilter = showFilter,
         showMessage = showMessage,
         messageText = messageText,
